@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: minha-banda-api
+    runtime: docker
+    plan: free
+    rootDir: minha_banda_server
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health/
+    envVars:
+      - key: DART_ENV
+        value: production
+      - key: PORT
+        value: "8080"
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_MINUTES
+        value: "60"

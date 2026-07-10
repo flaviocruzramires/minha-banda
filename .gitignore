@@ -1,0 +1,22 @@
+# Flutter/Dart
+minha_banda_flutter/build/
+minha_banda_flutter/.dart_tool/
+minha_banda_flutter/.flutter-plugins
+minha_banda_flutter/.flutter-plugins-dependencies
+minha_banda_flutter/.pub-cache/
+minha_banda_flutter/.pub/
+minha_banda_flutter/pubspec.lock
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Dart Server
+minha_banda_server/.dart_tool/
+minha_banda_server/.env
+minha_banda_server/build/
