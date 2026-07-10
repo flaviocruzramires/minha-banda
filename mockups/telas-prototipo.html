@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Minha Banda — Protótipos de Tela</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root{
+  --stage-black:#151317;
+  --stage-black-2:#1D1A20;
+  --spotlight:#F2A93B;
+  --spotlight-dim:#B87F27;
+  --curtain-wine:#7A1F3D;
+  --warm-white:#F7F3EC;
+  --confirmed:#4C7A5E;
+  --pending:#8A7F6B;
+  --danger:#C0503C;
+  --line: rgba(247,243,236,0.10);
+  --line-soft: rgba(247,243,236,0.06);
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background: radial-gradient(circle at 20% 0%, #241f27 0%, #0f0d11 55%, #0a090c 100%);
+  font-family:'Inter',sans-serif;
+  color:var(--warm-white);
+  padding:48px 32px 120px;
+}
+.intro{max-width:900px;margin:0 auto 56px;}
+.intro .eyebrow{
+  font-family:'Bebas Neue',sans-serif;letter-spacing:.14em;color:var(--spotlight);
+  font-size:15px;text-transform:uppercase;margin:0 0 6px;
+}
+.intro h1{
+  font-family:'Bebas Neue',sans-serif;font-size:56px;letter-spacing:.02em;margin:0 0 14px;
+  line-height:0.95;
+}
+.intro p{font-size:16px;line-height:1.6;color:rgba(247,243,236,0.72);max-width:620px;margin:0;}
+
+.gallery{
+  max-width:1500px;margin:0 auto;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:40px;
+}
+.slot{display:flex;flex-direction:column;align-items:center;gap:16px;}
+.slot .label{
+  font-family:'Bebas Neue',sans-serif;letter-spacing:.08em;font-size:20px;color:var(--warm-white);
+  display:flex;align-items:center;gap:10px;
+}
+.slot .label .n{
+  width:26px;height:26px;border-radius:50%;background:var(--spotlight);color:var(--stage-black);
+  font-family:'Inter',sans-serif;font-weight:800;font-size:13px;
+  display:flex;align-items:center;justify-content:center;
+}
+.slot .desc{font-size:13px;color:rgba(247,243,236,0.5);text-align:center;max-width:280px;margin-top:-10px;}
+
+/* ---------- phone frame ---------- */
+.phone{
+  width:320px;height:684px;border-radius:38px;background:#000;
+  padding:12px;box-shadow: 0 30px 70px -20px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04);
+  position:relative;
+}
+.screen{
+  width:100%;height:100%;border-radius:28px;overflow:hidden;position:relative;
+  background:var(--stage-black);display:flex;flex-direction:column;
+}
+.notch{
+  position:absolute;top:12px;left:50%;transform:translateX(-50%);
+  width:110px;height:22px;background:#000;border-radius:14px;z-index:50;
+}
+.statusbar{
+  height:44px;flex-shrink:0;display:flex;align-items:flex-end;justify-content:space-between;
+  padding:0 22px 8px;font-size:12px;font-weight:600;color:var(--warm-white);
+}
+
+/* ---------- shared UI atoms ---------- */
+.appbar{
+  padding:6px 20px 16px;display:flex;align-items:center;justify-content:space-between;
+}
+.appbar h2{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.03em;margin:0;}
+.pill{
+  padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.03em;
+}
+.pill.confirmado{background:rgba(76,122,94,0.22);color:#8FD1A8;}
+.pill.pendente{background:rgba(138,127,107,0.25);color:#D8CDB8;}
+.pill.conflito{background:rgba(192,80,60,0.2);color:#F2A08F;}
+.pill.pronta{background:rgba(76,122,94,0.22);color:#8FD1A8;}
+.pill.aprendendo{background:rgba(242,169,59,0.18);color:var(--spotlight);}
+
+.avatar{
+  width:26px;height:26px;border-radius:50%;border:2px solid var(--stage-black);
+  display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;
+  color:var(--stage-black);
+}
+.avatar-stack{display:flex;}
+.avatar-stack .avatar{margin-left:-8px;}
+.avatar-stack .avatar:first-child{margin-left:0;}
+
+.bottomnav{
+  margin-top:auto;flex-shrink:0;display:flex;justify-content:space-around;
+  padding:10px 6px 14px;border-top:1px solid var(--line);background:var(--stage-black-2);
+}
+.navitem{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;color:rgba(247,243,236,0.45);}
+.navitem.active{color:var(--spotlight);}
+.navicon{width:20px;height:20px;border-radius:5px;background:currentColor;opacity:.85;
+  clip-path:polygon(20% 0,80% 0,100% 40%,100% 100%,0 100%,0 40%);}
+
+/* ticket stub card — signature element */
+.ticket{
+  position:relative;background:var(--stage-black-2);border:1px solid var(--line);border-radius:16px;
+  padding:16px 16px 16px 18px;
+}
+.ticket::before{
+  content:"";position:absolute;left:-9px;top:50%;transform:translateY(-50%);
+  width:18px;height:18px;border-radius:50%;background:var(--stage-black);border:1px solid var(--line);
+}
+.ticket::after{
+  content:"";position:absolute;right:0;top:0;bottom:0;width:1px;
+  background-image: linear-gradient(var(--line) 60%, transparent 0%);
+  background-size: 1px 8px; background-repeat:repeat-y;
+}
+.band-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;}
+
+/* scroll content */
+.content{flex:1;overflow:hidden;padding:0 20px 16px;}
+.section-title{
+  font-size:11px;letter-spacing:.10em;text-transform:uppercase;color:rgba(247,243,236,0.4);
+  margin:18px 0 10px;font-weight:700;
+}
+</style>
+</head>
+<body>
+
+<div class="intro">
+  <p class="eyebrow">Minha Banda — Direção de Produto</p>
+  <h1>Protótipos de tela</h1>
+  <p>Seis telas centrais do fluxo, desenhadas para uso real de palco e ensaio: tema escuro permanente, alto contraste, cartão-ingresso como elemento de assinatura, e indicadores tipo VU-meter para status de confirmação.</p>
+</div>
+
+<div class="gallery">
+
+  <!-- 1. SELETOR DE PERFIL -->
+  <div class="slot">
+    <div class="label"><span class="n">1</span> Login → Seletor de perfil</div>
+    <div class="desc">Aparece só quando há mais de um vínculo ativo (requisito 9 — login único multi-perfil).</div>
+    <div class="phone"><div class="notch"></div><div class="screen">
+      <div class="statusbar"><span>9:41</span><span>●●●●</span></div>
+      <div style="padding:8px 24px 0;">
+        <p style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--spotlight);margin:0 0 4px;">Bem-vindo de volta</p>
+        <h2 style="font-family:'Bebas Neue';font-size:30px;margin:0 0 2px;">Flavio Andrade</h2>
+        <p style="font-size:13px;color:rgba(247,243,236,0.5);margin:0 0 22px;">Escolha onde você quer entrar</p>
+      </div>
+      <div style="padding:0 20px;display:flex;flex-direction:column;gap:14px;">
+        <div class="ticket" style="display:flex;align-items:center;gap:14px;">
+          <div style="width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--spotlight),var(--curtain-wine));flex-shrink:0;"></div>
+          <div style="flex:1;">
+            <div style="font-weight:700;font-size:15px;">Fusca69</div>
+            <div style="font-size:12px;color:rgba(247,243,236,0.5);">Rock clássico cover · Admin</div>
+          </div>
+          <div style="font-size:18px;color:rgba(247,243,236,0.3);">›</div>
+        </div>
+        <div class="ticket" style="display:flex;align-items:center;gap:14px;">
+          <div style="width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#4C7A5E,#1D1A20);flex-shrink:0;"></div>
+          <div style="flex:1;">
+            <div style="font-weight:700;font-size:15px;">Recanto do Cerrado</div>
+            <div style="font-size:12px;color:rgba(247,243,236,0.5);">Casa de show · Responsável</div>
+          </div>
+          <div style="font-size:18px;color:rgba(247,243,236,0.3);">›</div>
+        </div>
+        <button style="margin-top:8px;background:transparent;border:1px dashed var(--line);color:rgba(247,243,236,0.55);border-radius:14px;padding:14px;font-size:13px;font-weight:600;">+ Entrar em outra banda</button>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 2. HOME -->
+  <div class="slot">
+    <div class="label"><span class="n">2</span> Home — perfil músico</div>
+    <div class="desc">Contexto ativo "Fusca69" no topo, próximo evento em destaque, atalhos rápidos.</div>
+    <div class="phone"><div class="notch"></div><div class="screen">
+      <div class="statusbar"><span>9:41</span><span>●●●●</span></div>
+      <div class="appbar">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="band-dot" style="background:var(--spotlight);width:10px;height:10px;"></span>
+          <span style="font-weight:700;font-size:13px;">Fusca69</span>
+          <span style="font-size:11px;color:rgba(247,243,236,0.4);">▾</span>
+        </div>
+        <div style="width:30px;height:30px;border-radius:50%;background:var(--curtain-wine);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">FA</div>
+      </div>
+      <div class="content">
+        <p style="font-size:13px;color:rgba(247,243,236,0.5);margin:2px 0 2px;">Boa noite,</p>
+        <h2 style="font-family:'Bebas Neue';font-size:28px;margin:0 0 16px;">E aí, Flavio 🤘</h2>
+
+        <div class="section-title">Próximo compromisso</div>
+        <div class="ticket">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+            <div>
+              <div style="font-size:11px;color:var(--spotlight);font-weight:700;letter-spacing:.04em;">SÁBADO · 20H</div>
+              <div style="font-family:'Bebas Neue';font-size:22px;margin-top:2px;">Show — Recanto do Cerrado</div>
+              <div style="font-size:12px;color:rgba(247,243,236,0.5);margin-top:2px;">Aquidauana, MS</div>
+            </div>
+            <span class="pill confirmado">4/5 confirmados</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;">
+            <div class="avatar-stack">
+              <div class="avatar" style="background:var(--spotlight);">CL</div>
+              <div class="avatar" style="background:#8FD1A8;">MR</div>
+              <div class="avatar" style="background:#F2A08F;">JP</div>
+              <div class="avatar" style="background:#D8CDB8;">+2</div>
+            </div>
+            <span style="font-size:12px;color:var(--spotlight);font-weight:700;">Ver setlist →</span>
+          </div>
+        </div>
+
+        <div class="section-title">Atalhos</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div style="background:var(--stage-black-2);border:1px solid var(--line);border-radius:14px;padding:14px;">
+            <div style="font-size:20px;">🎤</div>
+            <div style="font-size:12px;font-weight:700;margin-top:8px;">Teleprompter</div>
+          </div>
+          <div style="background:var(--stage-black-2);border:1px solid var(--line);border-radius:14px;padding:14px;">
+            <div style="font-size:20px;">🎵</div>
+            <div style="font-size:12px;font-weight:700;margin-top:8px;">Repertório · 34</div>
+          </div>
+        </div>
+      </div>
+      <div class="bottomnav">
+        <div class="navitem active"><div class="navicon"></div>Início</div>
+        <div class="navitem"><div class="navicon"></div>Agenda</div>
+        <div class="navitem"><div class="navicon"></div>Eventos</div>
+        <div class="navitem"><div class="navicon"></div>Mais</div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 3. AGENDA -->
+  <div class="slot">
+    <div class="label"><span class="n">3</span> Agenda consolidada</div>
+    <div class="desc">Cruza todas as bandas do músico por cor; ponto de partida do motor de conflito.</div>
+    <div class="phone"><div class="notch"></div><div class="screen">
+      <div class="statusbar"><span>9:41</span><span>●●●●</span></div>
+      <div class="appbar"><h2>Agenda</h2><span style="font-size:20px;color:rgba(247,243,236,0.5);">+</span></div>
+      <div class="content">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <span style="font-size:13px;color:rgba(247,243,236,0.4);">‹</span>
+          <span style="font-family:'Bebas Neue';font-size:18px;letter-spacing:.03em;">JULHO 2026</span>
+          <span style="font-size:13px;color:rgba(247,243,236,0.4);">›</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;font-size:10px;color:rgba(247,243,236,0.35);text-align:center;margin-bottom:6px;">
+          <span>D</span><span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span>
+        </div>
+        <div id="cal" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;">
+        </div>
+      </div>
+      <div class="bottomnav">
+        <div class="navitem"><div class="navicon"></div>Início</div>
+        <div class="navitem active"><div class="navicon"></div>Agenda</div>
+        <div class="navitem"><div class="navicon"></div>Eventos</div>
+        <div class="navitem"><div class="navicon"></div>Mais</div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 4. EVENTOS -->
+  <div class="slot">
+    <div class="label"><span class="n">4</span> Lista de eventos + conflito</div>
+    <div class="desc">Card com selo de conflito de agenda multi-banda, sem bloquear a criação.</div>
+    <div class="phone"><div class="notch"></div><div class="screen">
+      <div class="statusbar"><span>9:41</span><span>●●●●</span></div>
+      <div class="appbar"><h2>Eventos</h2><span style="font-size:20px;color:rgba(247,243,236,0.5);">+</span></div>
+      <div style="padding:0 20px 10px;display:flex;gap:8px;">
+        <span class="pill" style="background:var(--spotlight);color:var(--stage-black);">Próximos</span>
+        <span class="pill" style="background:transparent;border:1px solid var(--line);color:rgba(247,243,236,0.5);">Passados</span>
+      </div>
+      <div class="content">
+        <div class="ticket" style="margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;">
+            <span style="font-size:11px;color:var(--spotlight);font-weight:700;">SÁB 12 JUL · 20H</span>
+            <span class="pill conflito">⚠ Conflito</span>
+          </div>
+          <div style="font-family:'Bebas Neue';font-size:19px;margin-top:2px;">Show — Recanto do Cerrado</div>
+          <div style="font-size:11px;color:rgba(247,243,236,0.45);margin-top:6px;">Carlos também tem show com <b style="color:rgba(247,243,236,0.7);">Banda Zeta</b> nesse horário.</div>
+        </div>
+        <div class="ticket" style="margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;">
+            <span style="font-size:11px;color:var(--spotlight);font-weight:700;">QUA 16 JUL · 19H</span>
+            <span class="pill pendente">2/5 confirmados</span>
+          </div>
+          <div style="font-family:'Bebas Neue';font-size:19px;margin-top:2px;">Ensaio — Estúdio Vintage</div>
+        </div>
+        <div class="ticket">
+          <div style="display:flex;justify-content:space-between;">
+            <span style="font-size:11px;color:var(--spotlight);font-weight:700;">SEX 25 JUL · 21H30</span>
+            <span class="pill confirmado">5/5 confirmados</span>
+          </div>
+          <div style="font-family:'Bebas Neue';font-size:19px;margin-top:2px;">Show — Bar do Zé, Bonito</div>
+        </div>
+      </div>
+      <div class="bottomnav">
+        <div class="navitem"><div class="navicon"></div>Início</div>
+        <div class="navitem"><div class="navicon"></div>Agenda</div>
+        <div class="navitem active"><div class="navicon"></div>Eventos</div>
+        <div class="navitem"><div class="navicon"></div>Mais</div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 5. REPERTORIO -->
+  <div class="slot">
+    <div class="label"><span class="n">5</span> Repertório da banda</div>
+    <div class="desc">Busca, tags, status de preparo — fonte para a montagem do setlist e do teleprompter.</div>
+    <div class="phone"><div class="notch"></div><div class="screen">
+      <div class="statusbar"><span>9:41</span><span>●●●●</span></div>
+      <div class="appbar"><h2>Repertório</h2><span style="font-size:20px;color:rgba(247,243,236,0.5);">+</span></div>
+      <div style="padding:0 20px 12px;">
+        <div style="background:var(--stage-black-2);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:13px;color:rgba(247,243,236,0.4);">🔎 Buscar música ou artista</div>
+      </div>
+      <div class="content" style="padding-top:0;">
+        <div style="display:flex;flex-direction:column;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line-soft);">
+            <div>
+              <div style="font-weight:700;font-size:14px;">Paint It Black</div>
+              <div style="font-size:11px;color:rgba(247,243,236,0.45);">The Rolling Stones · Em Mi menor</div>
+            </div>
+            <span class="pill pronta">Pronta</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line-soft);">
+            <div>
+              <div style="font-weight:700;font-size:14px;">Come Together</div>
+              <div style="font-size:11px;color:rgba(247,243,236,0.45);">The Beatles · Em Ré menor</div>
+            </div>
+            <span class="pill pronta">Pronta</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line-soft);">
+            <div>
+              <div style="font-weight:700;font-size:14px;">Voodoo Child</div>
+              <div style="font-size:11px;color:rgba(247,243,236,0.45);">Jimi Hendrix · Em Mi</div>
+            </div>
+            <span class="pill aprendendo">Aprendendo</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line-soft);">
+            <div>
+              <div style="font-weight:700;font-size:14px;">Admirável Gado Novo</div>
+              <div style="font-size:11px;color:rgba(247,243,236,0.45);">Zé Ramalho · Em Ré</div>
+            </div>
+            <span class="pill pronta">Pronta</span>
+          </div>
+          <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
+            <span class="pill" style="background:rgba(242,169,59,0.1);color:rgba(247,243,236,0.55);">#abertura</span>
+            <span class="pill" style="background:rgba(242,169,59,0.1);color:rgba(247,243,236,0.55);">#animada</span>
+            <span class="pill" style="background:rgba(242,169,59,0.1);color:rgba(247,243,236,0.55);">#romântica</span>
+          </div>
+        </div>
+      </div>
+      <div class="bottomnav">
+        <div class="navitem"><div class="navicon"></div>Início</div>
+        <div class="navitem"><div class="navicon"></div>Agenda</div>
+        <div class="navitem"><div class="navicon"></div>Eventos</div>
+        <div class="navitem active"><div class="navicon"></div>Mais</div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 6. TELEPROMPTER -->
+  <div class="slot">
+    <div class="label"><span class="n">6</span> Teleprompter — modo palco</div>
+    <div class="desc">Full-screen, alto contraste, sem navegação padrão, controles grandes ao alcance do polegar.</div>
+    <div class="phone"><div class="notch"></div><div class="screen" style="background:#000;">
+      <div class="statusbar" style="opacity:.5;"><span>9:41</span><span>●●●●</span></div>
+      <div style="padding:6px 22px 0;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:11px;color:rgba(247,243,236,0.4);">✕</span>
+        <span style="font-size:11px;color:var(--spotlight);font-weight:700;letter-spacing:.05em;">3 / 12 · PAINT IT BLACK</span>
+        <span style="font-size:11px;color:rgba(247,243,236,0.4);">Aa</span>
+      </div>
+      <div style="flex:1;padding:26px 24px 0;overflow:hidden;">
+        <p style="font-family:'Bebas Neue';font-size:30px;line-height:1.25;color:rgba(247,243,236,0.35);margin:0 0 18px;">
+          I see a red door<br>and I want it painted black
+        </p>
+        <p style="font-family:'Bebas Neue';font-size:30px;line-height:1.25;color:var(--warm-white);margin:0 0 18px;">
+          No colors anymore<br>I want them to turn black
+        </p>
+        <p style="font-family:'Bebas Neue';font-size:30px;line-height:1.25;color:rgba(247,243,236,0.25);margin:0;">
+          I see the girls walk by<br>dressed in their summer clothes
+        </p>
+      </div>
+      <div style="padding:14px 24px 8px;">
+        <div style="height:3px;background:var(--line);border-radius:2px;overflow:hidden;">
+          <div style="width:38%;height:100%;background:var(--spotlight);"></div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:26px;padding:10px 20px 26px;">
+        <span style="font-size:20px;color:rgba(247,243,236,0.5);">⟲</span>
+        <span style="font-size:20px;color:rgba(247,243,236,0.6);">‹‹</span>
+        <div style="width:56px;height:56px;border-radius:50%;background:var(--spotlight);display:flex;align-items:center;justify-content:center;color:var(--stage-black);font-size:22px;">▶</div>
+        <span style="font-size:20px;color:rgba(247,243,236,0.6);">››</span>
+        <span style="font-size:20px;color:rgba(247,243,236,0.5);">⚙</span>
+      </div>
+    </div></div>
+  </div>
+
+</div>
+
+<script>
+// monta o mini calendário da tela 3
+(function(){
+  const el = document.getElementById('cal');
+  const totalDias = 31, offset = 3; // julho/2026 começa numa quarta
+  const eventos = {12:'#F2A93B', 16:'#4C7A5E', 25:'#F2A93B', 30:'#7A1F3D'};
+  let html = '';
+  for(let i=0;i<offset;i++){ html += '<div></div>'; }
+  for(let d=1; d<=totalDias; d++){
+    const cor = eventos[d];
+    const hoje = d===9;
+    html += `<div style="aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+      border-radius:8px;font-size:11px;background:${hoje ? 'rgba(242,169,59,0.15)' : 'transparent'};
+      color:${hoje ? 'var(--spotlight)' : 'rgba(247,243,236,0.7)'};font-weight:${hoje?'800':'500'};">
+      ${d}
+      <span style="width:4px;height:4px;border-radius:50%;margin-top:2px;background:${cor||'transparent'};"></span>
+    </div>`;
+  }
+  el.innerHTML = html;
+  document.getElementById('cal').style.gridColumn = '1 / -1';
+})();
+</script>
+
+</body>
+</html>

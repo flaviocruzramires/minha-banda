@@ -1,0 +1,32 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - 'minha_banda_server/**'
+      - 'minha_banda_client/**'
+
+jobs:
+  analyze-and-test:
+    name: Analyze & Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: '3.3'
+
+      - name: Install dependencies (server)
+        run: dart pub get
+        working-directory: minha_banda_server
+
+      - name: Analyze (server)
+        run: dart analyze --fatal-infos
+        working-directory: minha_banda_server
+
+      - name: Run tests (server)
+        run: dart test --reporter=expanded
+        working-directory: minha_banda_server

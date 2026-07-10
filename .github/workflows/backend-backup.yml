@@ -1,0 +1,36 @@
+name: Daily Postgres Backup
+
+# Backup diário do Neon às 06:00 UTC (03:00 Brasília).
+# Artefato retido 30 dias no GitHub (free tier).
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+jobs:
+  backup:
+    name: pg_dump → GitHub Artifact
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dump Neon Postgres
+        run: |
+          FILENAME="minha_banda_$(date +%Y%m%d_%H%M%S).dump"
+          docker run --rm \
+            -e PGPASSWORD="${{ secrets.NEON_DB_PASSWORD }}" \
+            -v /tmp:/backup \
+            postgres:16 \
+            pg_dump \
+              --host="${{ secrets.NEON_DB_HOST }}" \
+              --port=5432 \
+              --username="${{ secrets.NEON_DB_USER }}" \
+              --dbname=minha_banda \
+              --format=c \
+              --file="/backup/$FILENAME"
+          echo "BACKUP_FILE=$FILENAME" >> $GITHUB_ENV
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-backup-${{ github.run_id }}
+          path: /tmp/${{ env.BACKUP_FILE }}
+          retention-days: 30

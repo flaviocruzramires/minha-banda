@@ -1,0 +1,22 @@
+name: Backend Keep-Alive
+
+# Pinga o endpoint de health a cada 4 minutos para evitar que o Render (suspend
+# após 15 min) e o Neon (suspend após 5 min) entrem em cold-start.
+on:
+  schedule:
+    - cron: '*/4 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    name: Ping health endpoint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping /livez
+        run: |
+          STATUS=$(curl -o /dev/null -s -w "%{http_code}" https://api.minha-banda.com.br/livez)
+          echo "HTTP status: $STATUS"
+          if [ "$STATUS" != "200" ]; then
+            echo "Health check failed with status $STATUS"
+            exit 1
+          fi
