@@ -2,7 +2,9 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/repositories/mock_auth_repository.dart';
+import '../../data/repositories/http_auth_repository.dart';
+import '../../data/repositories/mock_auth_repository.dart'
+    show EmailJaCadastradoException, NomeBandaEmUsoException;
 import '../../domain/entities/app_user.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../../bandas/domain/entities/banda.dart';
@@ -68,7 +70,7 @@ class CadastroState extends Equatable {
 // ---------------------------------------------------------------------------
 
 final authRepositoryProvider = Provider<AuthRepository>(
-  (ref) => MockAuthRepository(),
+  (ref) => HttpAuthRepository(),
 );
 
 final cadastroNotifierProvider =
