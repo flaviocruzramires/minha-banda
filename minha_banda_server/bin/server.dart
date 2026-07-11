@@ -28,8 +28,6 @@ void main() async {
   final cfg = AppConfig.instance;
   final sl = await ServiceLocator.init();
 
-  final authRequired = Pipeline().addMiddleware(authMiddleware()).handler;
-
   final api = Router()
     ..mount('/auth/', sl.authController.router.call)
     ..mount('/bandas/', Pipeline()
@@ -49,11 +47,14 @@ void main() async {
   final server = await io.serve(handler, cfg.host, cfg.port);
   Logger('Server').info('Rodando em http://${server.address.host}:${server.port}');
 
-  ProcessSignal.sigterm.watch().listen((_) async {
-    await sl.close();
-    await server.close(force: true);
-    exit(0);
-  });
+  // SIGTERM não é suportado no Windows; só registra em plataformas Unix (produção no Render)
+  if (!Platform.isWindows) {
+    ProcessSignal.sigterm.watch().listen((_) async {
+      await sl.close();
+      await server.close(force: true);
+      exit(0);
+    });
+  }
 }
 
 Response _health(Request _) =>
