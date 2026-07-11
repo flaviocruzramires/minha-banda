@@ -7,6 +7,6 @@ void main() {
     await tester.pumpWidget(
       const ProviderScope(child: MinhaBandaApp()),
     );
-    expect(find.text('Crie sua conta'), findsOneWidget);
+    expect(find.text('Agenda'), findsOneWidget);
   });
 }
