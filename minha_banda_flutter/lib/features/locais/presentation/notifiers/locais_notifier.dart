@@ -47,8 +47,8 @@ class LocaisNotifier extends StateNotifier<LocaisState> {
     try {
       final locais = await _repo.listar();
       state = state.copyWith(status: LocaisStatus.success, locais: locais);
-    } catch (_) {
-      state = state.copyWith(status: LocaisStatus.error, erro: 'Erro ao carregar locais.');
+    } catch (e) {
+      state = state.copyWith(status: LocaisStatus.error, erro: e.toString());
     }
   }
 
@@ -65,6 +65,17 @@ class LocaisNotifier extends StateNotifier<LocaisState> {
       state = state.copyWith(locais: [...state.locais, novo]);
     } catch (_) {
       state = state.copyWith(status: LocaisStatus.error, erro: 'Erro ao criar local.');
+    }
+  }
+
+  Future<void> atualizar(Local local) async {
+    try {
+      final updated = await _repo.atualizar(local);
+      state = state.copyWith(
+        locais: state.locais.map((l) => l.id == updated.id ? updated : l).toList(),
+      );
+    } catch (_) {
+      state = state.copyWith(status: LocaisStatus.error, erro: 'Erro ao atualizar local.');
     }
   }
 

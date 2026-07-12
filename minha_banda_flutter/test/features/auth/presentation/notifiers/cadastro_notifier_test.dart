@@ -46,7 +46,7 @@ void main() {
             nomeArtistico: any(named: 'nomeArtistico'),
             email: any(named: 'email'),
             senha: any(named: 'senha'),
-          )).thenAnswer((_) async => usuarioFixture);
+          )).thenAnswer((_) async => (user: usuarioFixture, token: 'tok'));
 
       final notifier = container.read(cadastroNotifierProvider.notifier);
       final ok = await notifier.cadastrarUsuario(
@@ -128,7 +128,7 @@ void main() {
             nomeArtistico: any(named: 'nomeArtistico'),
             email: any(named: 'email'),
             senha: any(named: 'senha'),
-          )).thenAnswer((_) async => usuarioFixture);
+          )).thenAnswer((_) async => (user: usuarioFixture, token: 'tok'));
       when(() => repo.criarBanda(
             userId: any(named: 'userId'),
             nome: any(named: 'nome'),
@@ -163,7 +163,7 @@ void main() {
             nomeArtistico: any(named: 'nomeArtistico'),
             email: any(named: 'email'),
             senha: any(named: 'senha'),
-          )).thenAnswer((_) async => usuarioFixture);
+          )).thenAnswer((_) async => (user: usuarioFixture, token: 'tok'));
       when(() => repo.criarBanda(
             userId: any(named: 'userId'),
             nome: any(named: 'nome'),
@@ -200,7 +200,7 @@ void main() {
             nomeArtistico: any(named: 'nomeArtistico'),
             email: any(named: 'email'),
             senha: any(named: 'senha'),
-          )).thenAnswer((_) async => usuarioFixture);
+          )).thenAnswer((_) async => (user: usuarioFixture, token: 'tok'));
       when(() => repo.criarBanda(
             userId: any(named: 'userId'),
             nome: any(named: 'nome'),

@@ -22,9 +22,9 @@ class HttpEventosRepository implements EventosRepository {
 
   @override
   Future<List<Evento>> listar(String bandaId) async {
-    final res = await _client.get(Uri.parse('$_base/api/v1/bandas/$bandaId/eventos'), headers: _headers);
+    final res = await _client.get(Uri.parse('$_base/api/v1/bandas/$bandaId/eventos/'), headers: _headers);
     final body = jsonDecode(res.body) as Map<String, dynamic>;
-    final list = body['data']['eventos'] as List<dynamic>;
+    final list = body['data'] as List<dynamic>;
     return list.map((e) => Evento.fromJson(e as Map<String, dynamic>)).toList();
   }
 
@@ -34,13 +34,13 @@ class HttpEventosRepository implements EventosRepository {
     required DateTime dataHoraInicio, DateTime? dataHoraFim, String? localId,
     required String status, String? notas,
   }) async {
-    final res = await _client.post(Uri.parse('$_base/api/v1/eventos'), headers: _headers,
+    final res = await _client.post(Uri.parse('$_base/api/v1/bandas/$bandaId/eventos/'), headers: _headers,
         body: jsonEncode({'bandaId': bandaId, 'tipo': tipo, 'titulo': titulo,
           'dataHoraInicio': dataHoraInicio.toIso8601String(),
           'dataHoraFim': dataHoraFim?.toIso8601String(), 'localId': localId,
           'status': status, 'notas': notas}));
     final body = jsonDecode(res.body) as Map<String, dynamic>;
-    return Evento.fromJson(body['data'] as Map<String, dynamic>);
+    return Evento.fromJson((body['data'] as Map<String, dynamic>)['evento'] as Map<String, dynamic>);
   }
 
   @override
@@ -48,7 +48,7 @@ class HttpEventosRepository implements EventosRepository {
     final res = await _client.put(Uri.parse('$_base/api/v1/eventos/${evento.id}'),
         headers: _headers, body: jsonEncode(evento.toJson()));
     final body = jsonDecode(res.body) as Map<String, dynamic>;
-    return Evento.fromJson(body['data'] as Map<String, dynamic>);
+    return Evento.fromJson((body['data'] as Map<String, dynamic>)['evento'] as Map<String, dynamic>);
   }
 
   @override
@@ -58,43 +58,51 @@ class HttpEventosRepository implements EventosRepository {
 
   @override
   Future<List<ChecklistItem>> listarChecklist(String eventoId) async {
-    final res = await _client.get(Uri.parse('$_base/api/v1/eventos/$eventoId/checklist'), headers: _headers);
+    final res = await _client.get(Uri.parse('$_base/api/v1/eventos/$eventoId/checklist/'), headers: _headers);
     final body = jsonDecode(res.body) as Map<String, dynamic>;
-    final list = body['data']['checklist'] as List<dynamic>;
+    final list = body['data'] as List<dynamic>;
     return list.map((e) => ChecklistItem.fromJson(e as Map<String, dynamic>)).toList();
   }
 
   @override
   Future<ChecklistItem> addChecklist({required String eventoId, required String descricao}) async {
-    final res = await _client.post(Uri.parse('$_base/api/v1/eventos/$eventoId/checklist'),
+    final res = await _client.post(Uri.parse('$_base/api/v1/eventos/$eventoId/checklist/'),
         headers: _headers, body: jsonEncode({'descricao': descricao}));
     final body = jsonDecode(res.body) as Map<String, dynamic>;
-    return ChecklistItem.fromJson(body['data'] as Map<String, dynamic>);
+    return ChecklistItem.fromJson((body['data'] as Map<String, dynamic>)['item'] as Map<String, dynamic>);
   }
 
   @override
   Future<ChecklistItem> toggleChecklist(ChecklistItem item) async {
-    final res = await _client.put(
-        Uri.parse('$_base/api/v1/checklist/${item.id}'),
+    await _client.put(
+        Uri.parse('$_base/api/v1/eventos/${item.eventoId}/checklist/${item.id}'),
         headers: _headers,
         body: jsonEncode({'concluido': !item.concluido}));
-    final body = jsonDecode(res.body) as Map<String, dynamic>;
-    return ChecklistItem.fromJson(body['data'] as Map<String, dynamic>);
+    return item.copyWith(concluido: !item.concluido);
   }
 
   @override
   Future<List<EventoConfirmacao>> listarConfirmacoes(String eventoId) async {
-    final res = await _client.get(Uri.parse('$_base/api/v1/eventos/$eventoId/confirmacoes'), headers: _headers);
+    final res = await _client.get(Uri.parse('$_base/api/v1/eventos/$eventoId/confirmacoes/'), headers: _headers);
     final body = jsonDecode(res.body) as Map<String, dynamic>;
-    final list = body['data']['confirmacoes'] as List<dynamic>;
+    final list = body['data'] as List<dynamic>;
     return list.map((e) => EventoConfirmacao.fromJson(e as Map<String, dynamic>)).toList();
   }
 
   @override
   Future<EventoConfirmacao> confirmarPresenca({required String eventoId, required String userId, required String status}) async {
-    final res = await _client.post(Uri.parse('$_base/api/v1/eventos/$eventoId/confirmacoes'),
+    final res = await _client.post(Uri.parse('$_base/api/v1/eventos/$eventoId/confirmacoes/'),
         headers: _headers, body: jsonEncode({'userId': userId, 'status': status}));
-    final body = jsonDecode(res.body) as Map<String, dynamic>;
-    return EventoConfirmacao.fromJson(body['data'] as Map<String, dynamic>);
+    if (res.statusCode < 200 || res.statusCode >= 300) {
+      final body = jsonDecode(res.body) as Map<String, dynamic>;
+      final msg = body['error'] as String? ?? 'Erro ${res.statusCode}';
+      throw Exception(msg);
+    }
+    return EventoConfirmacao(
+      id: 'local-${DateTime.now().millisecondsSinceEpoch}',
+      eventoId: eventoId,
+      userId: userId,
+      status: status,
+    );
   }
 }

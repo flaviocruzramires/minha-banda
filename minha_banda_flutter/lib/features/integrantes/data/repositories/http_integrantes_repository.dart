@@ -20,22 +20,25 @@ class HttpIntegrantesRepository implements IntegrantesRepository {
 
   @override
   Future<List<Integrante>> listar(String bandaId) async {
-    final res = await _client.get(Uri.parse('$_base/api/v1/bandas/$bandaId/integrantes'), headers: _headers);
+    final res = await _client.get(Uri.parse('$_base/api/v1/bandas/$bandaId/integrantes/'), headers: _headers);
     final body = jsonDecode(res.body) as Map<String, dynamic>;
-    final list = body['data']['integrantes'] as List<dynamic>;
+    final list = body['data'] as List<dynamic>;
     return list.map((e) => Integrante.fromJson(e as Map<String, dynamic>)).toList();
   }
 
   @override
   Future<Integrante> atualizar(Integrante integrante) async {
-    final res = await _client.put(Uri.parse('$_base/api/v1/integrantes/${integrante.id}'),
+    final res = await _client.put(
+        Uri.parse('$_base/api/v1/bandas/${integrante.bandaId}/integrantes/${integrante.userId}'),
         headers: _headers, body: jsonEncode(integrante.toJson()));
     final body = jsonDecode(res.body) as Map<String, dynamic>;
     return Integrante.fromJson(body['data'] as Map<String, dynamic>);
   }
 
   @override
-  Future<void> remover(String id) async {
-    await _client.delete(Uri.parse('$_base/api/v1/integrantes/$id'), headers: _headers);
+  Future<void> remover(Integrante integrante) async {
+    await _client.delete(
+        Uri.parse('$_base/api/v1/bandas/${integrante.bandaId}/integrantes/${integrante.userId}'),
+        headers: _headers);
   }
 }

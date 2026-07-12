@@ -4,7 +4,7 @@ import '../exceptions/app_exception.dart';
 
 abstract final class RequestHelper {
   static Future<Map<String, dynamic>> parseBody(Request request) async {
-    final body = await request.readAsString();
+    final body = await request.readAsString(utf8);
     if (body.isEmpty) return {};
     try {
       final decoded = jsonDecode(body);

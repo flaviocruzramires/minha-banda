@@ -21,7 +21,7 @@ class HttpTeleprompterRepository implements TeleprompterRepository {
   @override
   Future<List<MusicaTeleprompter>> getEventoComLetra(String eventoId) async {
     final res = await _client.get(
-      Uri.parse('$_base/api/v1/eventos/$eventoId/teleprompter'),
+      Uri.parse('$_base/api/v1/teleprompter/evento/$eventoId'),
       headers: _headers,
     );
     final body = jsonDecode(res.body) as Map<String, dynamic>;

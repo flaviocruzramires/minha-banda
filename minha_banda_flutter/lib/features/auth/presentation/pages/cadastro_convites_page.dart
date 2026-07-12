@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../contexto/presentation/notifiers/contexto_notifier.dart';
 import '../notifiers/cadastro_notifier.dart';
 import '../widgets/indicador_passos.dart';
 
@@ -48,7 +50,8 @@ class _CadastroConvitesPageState extends ConsumerState<CadastroConvitesPage> {
   }
 
   void _concluir() {
-    Navigator.of(context).popUntil((route) => route.isFirst);
+    ref.read(contextoNotifierProvider.notifier).carregar();
+    context.go('/');
   }
 
   @override

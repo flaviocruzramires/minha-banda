@@ -52,7 +52,7 @@ class MockRepertorioRepository implements RepertorioRepository {
   }
 
   @override
-  Future<void> deletar(String id) async {
+  Future<void> deletar(String bandaId, String id) async {
     await Future.delayed(const Duration(milliseconds: 200));
   }
 }

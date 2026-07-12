@@ -19,7 +19,7 @@ class MockIntegrantesRepository implements IntegrantesRepository {
   }
 
   @override
-  Future<void> remover(String id) async {
+  Future<void> remover(Integrante integrante) async {
     await Future.delayed(const Duration(milliseconds: 200));
   }
 }

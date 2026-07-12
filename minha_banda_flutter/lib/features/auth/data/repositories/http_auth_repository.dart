@@ -8,7 +8,7 @@ import '../../domain/entities/app_user.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../../bandas/domain/entities/banda.dart';
 import 'mock_auth_repository.dart'
-    show EmailJaCadastradoException, NomeBandaEmUsoException;
+    show EmailJaCadastradoException, CredenciaisInvalidasException, NomeBandaEmUsoException;
 
 class HttpAuthRepository implements AuthRepository {
   HttpAuthRepository({http.Client? client, String? baseUrl})
@@ -17,14 +17,10 @@ class HttpAuthRepository implements AuthRepository {
 
   final http.Client _client;
   final String _base;
-
-  // JWT armazenado em memória após cadastro/login
   String? _token;
 
-  // -------------------------------------------------------------------------
-
   @override
-  Future<AppUser> cadastrar({
+  Future<AuthResult> cadastrar({
     required String nomeArtistico,
     required String email,
     required String senha,
@@ -44,12 +40,45 @@ class HttpAuthRepository implements AuthRepository {
     if (res.statusCode == 409) throw const EmailJaCadastradoException();
     _assertOk(res, body);
 
-    _token = body['token'] as String?;
-    final u = body['user'] as Map<String, dynamic>;
-    return AppUser(
-      id: u['id'] as String,
-      nomeArtistico: u['nomeArtistico'] as String,
-      email: u['email'] as String,
+    final data = body['data'] as Map<String, dynamic>;
+    _token = data['token'] as String;
+    final u = data['user'] as Map<String, dynamic>;
+    return (
+      user: AppUser(
+        id: u['id'] as String,
+        nomeArtistico: u['nomeArtistico'] as String,
+        email: u['email'] as String,
+      ),
+      token: _token!,
+    );
+  }
+
+  @override
+  Future<AuthResult> login({
+    required String email,
+    required String senha,
+  }) async {
+    final res = await _client.post(
+      Uri.parse('$_base/api/v1/auth/login'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email, 'senha': senha}),
+    );
+
+    final body = _decode(res);
+
+    if (res.statusCode == 401) throw const CredenciaisInvalidasException();
+    _assertOk(res, body);
+
+    final data = body['data'] as Map<String, dynamic>;
+    _token = data['token'] as String;
+    final u = data['user'] as Map<String, dynamic>;
+    return (
+      user: AppUser(
+        id: u['id'] as String,
+        nomeArtistico: u['nomeArtistico'] as String,
+        email: u['email'] as String,
+      ),
+      token: _token!,
     );
   }
 
@@ -62,7 +91,7 @@ class HttpAuthRepository implements AuthRepository {
     required int corHex,
   }) async {
     final res = await _client.post(
-      Uri.parse('$_base/api/v1/bandas'),
+      Uri.parse('$_base/api/v1/bandas/'),
       headers: _authHeaders,
       body: jsonEncode({
         'nome': nome,
@@ -77,7 +106,8 @@ class HttpAuthRepository implements AuthRepository {
     if (res.statusCode == 409) throw const NomeBandaEmUsoException();
     _assertOk(res, body);
 
-    return _bandaFromJson(body);
+    final data = body['data'] as Map<String, dynamic>;
+    return _bandaFromJson(data['banda'] as Map<String, dynamic>);
   }
 
   @override
@@ -101,10 +131,9 @@ class HttpAuthRepository implements AuthRepository {
     );
     final body = _decode(res);
     _assertOk(res, body);
-    return body['link'] as String;
+    final data = body['data'] as Map<String, dynamic>;
+    return data['linkConvite'] as String;
   }
-
-  // -------------------------------------------------------------------------
 
   Map<String, String> get _authHeaders => {
         'Content-Type': 'application/json',
@@ -118,7 +147,7 @@ class HttpAuthRepository implements AuthRepository {
 
   void _assertOk(http.Response res, Map<String, dynamic> body) {
     if (res.statusCode >= 200 && res.statusCode < 300) return;
-    final msg = body['message'] as String? ?? 'Erro ${res.statusCode}';
+    final msg = body['error'] as String? ?? body['message'] as String? ?? 'Erro ${res.statusCode}';
     throw HttpRepositoryException(res.statusCode, msg);
   }
 

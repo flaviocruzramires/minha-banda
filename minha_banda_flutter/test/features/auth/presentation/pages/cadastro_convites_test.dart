@@ -40,7 +40,7 @@ void main() {
       [
         authRepositoryProvider.overrideWithValue(repo),
         cadastroNotifierProvider.overrideWith(
-          (ref) => CadastroNotifier(repo)..state = estadoInicial,
+          (ref) => CadastroNotifier(repo, ref)..state = estadoInicial,
         ),
       ];
 

@@ -24,7 +24,7 @@ class HttpRepertorioRepository implements RepertorioRepository {
   @override
   Future<List<Musica>> listar(String bandaId) async {
     final res = await _client.get(
-      Uri.parse('$_base/api/v1/bandas/$bandaId/musicas'),
+      Uri.parse('$_base/api/v1/bandas/$bandaId/musicas/'),
       headers: _headers,
     );
     final body = jsonDecode(res.body) as Map<String, dynamic>;
@@ -48,10 +48,9 @@ class HttpRepertorioRepository implements RepertorioRepository {
     required String status,
   }) async {
     final res = await _client.post(
-      Uri.parse('$_base/api/v1/musicas'),
+      Uri.parse('$_base/api/v1/bandas/$bandaId/musicas/'),
       headers: _headers,
       body: jsonEncode({
-        'bandaId': bandaId,
         'titulo': titulo,
         'artistaOriginal': artistaOriginal,
         'tonalidade': tonalidade,
@@ -66,24 +65,24 @@ class HttpRepertorioRepository implements RepertorioRepository {
       }),
     );
     final body = jsonDecode(res.body) as Map<String, dynamic>;
-    return Musica.fromJson(body['data'] as Map<String, dynamic>);
+    return Musica.fromJson((body['data'] as Map<String, dynamic>)['musica'] as Map<String, dynamic>);
   }
 
   @override
   Future<Musica> atualizar(Musica musica) async {
     final res = await _client.put(
-      Uri.parse('$_base/api/v1/musicas/${musica.id}'),
+      Uri.parse('$_base/api/v1/bandas/${musica.bandaId}/musicas/${musica.id}'),
       headers: _headers,
       body: jsonEncode(musica.toJson()),
     );
     final body = jsonDecode(res.body) as Map<String, dynamic>;
-    return Musica.fromJson(body['data'] as Map<String, dynamic>);
+    return Musica.fromJson((body['data'] as Map<String, dynamic>)['musica'] as Map<String, dynamic>);
   }
 
   @override
-  Future<void> deletar(String id) async {
+  Future<void> deletar(String bandaId, String id) async {
     await _client.delete(
-      Uri.parse('$_base/api/v1/musicas/$id'),
+      Uri.parse('$_base/api/v1/bandas/$bandaId/musicas/$id'),
       headers: _headers,
     );
   }

@@ -51,10 +51,6 @@ class _AgendaPageState extends ConsumerState<AgendaPage> {
 
     return Scaffold(
       backgroundColor: AppColors.stageBlack,
-      appBar: AppBar(
-        backgroundColor: AppColors.stageBlack2,
-        title: const Text('Agenda', style: TextStyle(color: AppColors.warmWhite)),
-      ),
       body: state.isLoading
           ? const LoadingOverlay()
           : items.isEmpty

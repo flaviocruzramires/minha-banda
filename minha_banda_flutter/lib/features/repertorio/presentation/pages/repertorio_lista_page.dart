@@ -46,11 +46,6 @@ class _RepertorioListaPageState extends ConsumerState<RepertorioListaPage> {
 
     return Scaffold(
       backgroundColor: AppColors.stageBlack,
-      appBar: AppBar(
-        backgroundColor: AppColors.stageBlack2,
-        title: const Text('Repertório', style: TextStyle(color: AppColors.warmWhite)),
-        iconTheme: const IconThemeData(color: AppColors.warmWhite),
-      ),
       body: Column(
         children: [
           Padding(

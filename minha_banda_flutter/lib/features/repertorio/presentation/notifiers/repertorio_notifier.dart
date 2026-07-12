@@ -120,11 +120,11 @@ class RepertorioNotifier extends StateNotifier<RepertorioState> {
     }
   }
 
-  Future<void> deletar(String id) async {
+  Future<void> deletar(Musica musica) async {
     try {
-      await _repo.deletar(id);
+      await _repo.deletar(musica.bandaId, musica.id);
       state = state.copyWith(
-        musicas: state.musicas.where((m) => m.id != id).toList(),
+        musicas: state.musicas.where((m) => m.id != musica.id).toList(),
       );
     } catch (_) {
       state = state.copyWith(

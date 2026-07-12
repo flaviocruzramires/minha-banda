@@ -51,5 +51,5 @@ class _ThrowingRepertorioRepository implements RepertorioRepository {
   Future<Musica> atualizar(Musica musica) => Future.error(Exception('fail'));
 
   @override
-  Future<void> deletar(String id) => Future.error(Exception('fail'));
+  Future<void> deletar(String bandaId, String id) => Future.error(Exception('fail'));
 }

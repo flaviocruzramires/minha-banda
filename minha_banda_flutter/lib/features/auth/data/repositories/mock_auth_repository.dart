@@ -9,7 +9,7 @@ class MockAuthRepository implements AuthRepository {
   final Set<String> _nomesBanda = {};
 
   @override
-  Future<AppUser> cadastrar({
+  Future<AuthResult> cadastrar({
     required String nomeArtistico,
     required String email,
     required String senha,
@@ -19,10 +19,32 @@ class MockAuthRepository implements AuthRepository {
       throw const EmailJaCadastradoException();
     }
     _emailsCadastrados.add(email.toLowerCase());
-    return AppUser(
-      id: 'usr_${DateTime.now().millisecondsSinceEpoch}',
-      nomeArtistico: nomeArtistico,
-      email: email,
+    return (
+      user: AppUser(
+        id: 'usr_${DateTime.now().millisecondsSinceEpoch}',
+        nomeArtistico: nomeArtistico,
+        email: email,
+      ),
+      token: 'mock-token',
+    );
+  }
+
+  @override
+  Future<AuthResult> login({
+    required String email,
+    required String senha,
+  }) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    if (!_emailsCadastrados.contains(email.toLowerCase())) {
+      throw const CredenciaisInvalidasException();
+    }
+    return (
+      user: AppUser(
+        id: 'usr_mock',
+        nomeArtistico: 'Usuário Mock',
+        email: email,
+      ),
+      token: 'mock-token',
     );
   }
 
@@ -67,6 +89,12 @@ class EmailJaCadastradoException implements Exception {
   const EmailJaCadastradoException();
   @override
   String toString() => 'E-mail já cadastrado.';
+}
+
+class CredenciaisInvalidasException implements Exception {
+  const CredenciaisInvalidasException();
+  @override
+  String toString() => 'E-mail ou senha inválidos.';
 }
 
 class NomeBandaEmUsoException implements Exception {

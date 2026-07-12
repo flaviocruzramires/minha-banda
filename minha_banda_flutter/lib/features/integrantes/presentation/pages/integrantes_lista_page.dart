@@ -32,11 +32,6 @@ class _IntegrantesListaPageState extends ConsumerState<IntegrantesListaPage> {
 
     return Scaffold(
       backgroundColor: AppColors.stageBlack,
-      appBar: AppBar(
-        backgroundColor: AppColors.stageBlack2,
-        title: const Text('Integrantes', style: TextStyle(color: AppColors.warmWhite)),
-        iconTheme: const IconThemeData(color: AppColors.warmWhite),
-      ),
       body: state.isLoading
           ? const LoadingOverlay()
           : state.hasError

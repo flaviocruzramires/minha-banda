@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 import '../notifiers/teleprompter_notifier.dart';
 
 class TeleprompterPage extends ConsumerStatefulWidget {
@@ -18,6 +19,7 @@ class _TeleprompterPageState extends ConsumerState<TeleprompterPage> {
   @override
   void initState() {
     super.initState();
+    WakelockPlus.enable();
     Future.microtask(
       () => ref.read(teleprompterNotifierProvider.notifier).carregar(widget.eventoId),
     );
@@ -25,6 +27,7 @@ class _TeleprompterPageState extends ConsumerState<TeleprompterPage> {
 
   @override
   void dispose() {
+    WakelockPlus.disable();
     _timer?.cancel();
     _scrollController.dispose();
     super.dispose();

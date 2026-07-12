@@ -100,7 +100,7 @@ class _IntegrantePerfilPageState extends ConsumerState<IntegrantePerfilPage> {
         const SizedBox(height: 24),
         OutlinedButton(
           onPressed: () async {
-            await ref.read(integrantesNotifierProvider.notifier).remover(i.id);
+            await ref.read(integrantesNotifierProvider.notifier).remover(i);
             if (mounted) context.pop();
           },
           style: OutlinedButton.styleFrom(

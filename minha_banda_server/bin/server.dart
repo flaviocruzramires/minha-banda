@@ -28,54 +28,57 @@ void main() async {
   final cfg = AppConfig.instance;
   final sl = await ServiceLocator.init();
 
-  final api = Router()
-    ..mount('/auth/', sl.authController.router.call)
-    ..mount('/bandas/', Pipeline()
-        .addMiddleware(authMiddleware())
-        .addHandler(sl.bandaController.router.call))
-    ..mount('/bandas/<bandaId>/musicas/', Pipeline()
-        .addMiddleware(authMiddleware())
-        .addHandler(sl.musicaController.router.call))
-    ..mount('/eventos/<eventoId>/setlist', Pipeline()
-        .addMiddleware(authMiddleware())
-        .addHandler(sl.setlistController.router.call))
-    ..mount('/teleprompter/', Pipeline()
-        .addMiddleware(authMiddleware())
-        .addHandler(sl.teleprompterController.router.call))
-    ..mount('/locais/', Pipeline()
-        .addMiddleware(authMiddleware())
-        .addHandler(sl.localController.router.call))
-    ..get('/meus-locais', Pipeline()
-        .addMiddleware(authMiddleware())
-        .addHandler(sl.localController.meusLocaisHandler))
-    ..mount('/bandas/<bandaId>/integrantes/', Pipeline()
-        .addMiddleware(authMiddleware())
-        .addHandler(sl.integrantesController.router.call))
-    ..get('/meu-contexto', Pipeline()
-        .addMiddleware(authMiddleware())
-        .addHandler(sl.contextoController.handler))
-    ..mount('/bandas/<bandaId>/eventos/', Pipeline()
-        .addMiddleware(authMiddleware())
-        .addHandler(sl.eventoController.bandaRouter.call))
-    ..mount('/eventos/', Pipeline()
-        .addMiddleware(authMiddleware())
-        .addHandler(sl.eventoController.router.call))
-    ..mount('/eventos/<eventoId>/confirmacoes/', Pipeline()
-        .addMiddleware(authMiddleware())
-        .addHandler(sl.eventoActionsController.confirmacaoRouter.call))
-    ..mount('/eventos/<eventoId>/checklist/', Pipeline()
-        .addMiddleware(authMiddleware())
-        .addHandler(sl.eventoActionsController.checklistRouter.call))
-    ..mount('/agenda/', Pipeline()
-        .addMiddleware(authMiddleware())
-        .addHandler(sl.bloqueioController.router.call))
-    ..mount('/conflitos/', Pipeline()
-        .addMiddleware(authMiddleware())
-        .addHandler(sl.conflitosController.router.call));
+  // shelf_router não suporta parâmetros em mount() — registrar rotas completas diretamente.
+  final protectedApi = Router()
+    // Bandas (sem parâmetro no mount — funciona corretamente)
+    ..mount('/bandas/', sl.bandaController.router.call)
+    // Músicas por banda — rotas com parâmetro registradas individualmente
+    ..get('/bandas/<bandaId>/musicas/', sl.musicaController.listar)
+    ..post('/bandas/<bandaId>/musicas/', sl.musicaController.criar)
+    ..get('/bandas/<bandaId>/musicas/<id>', sl.musicaController.buscar)
+    ..put('/bandas/<bandaId>/musicas/<id>', sl.musicaController.atualizar)
+    ..delete('/bandas/<bandaId>/musicas/<id>', sl.musicaController.deletar)
+    // Integrantes por banda
+    ..get('/bandas/<bandaId>/integrantes/', sl.integrantesController.listar)
+    ..get('/bandas/<bandaId>/integrantes/<userId>', sl.integrantesController.buscar)
+    ..put('/bandas/<bandaId>/integrantes/<userId>', sl.integrantesController.atualizar)
+    ..delete('/bandas/<bandaId>/integrantes/<userId>', sl.integrantesController.remover)
+    // Eventos por banda
+    ..get('/bandas/<bandaId>/eventos/', sl.eventoController.listar)
+    ..post('/bandas/<bandaId>/eventos/', sl.eventoController.criar)
+    // Eventos por id (buscar/atualizar/deletar)
+    ..mount('/eventos/', sl.eventoController.router.call)
+    // Confirmações de presença
+    ..get('/eventos/<eventoId>/confirmacoes/', sl.eventoActionsController.listarConfirmacoes)
+    ..post('/eventos/<eventoId>/confirmacoes/', sl.eventoActionsController.confirmar)
+    // Checklist
+    ..get('/eventos/<eventoId>/checklist/', sl.eventoActionsController.listarChecklist)
+    ..post('/eventos/<eventoId>/checklist/', sl.eventoActionsController.addItem)
+    ..put('/eventos/<eventoId>/checklist/<itemId>', sl.eventoActionsController.toggleItem)
+    ..delete('/eventos/<eventoId>/checklist/<itemId>', sl.eventoActionsController.deleteItem)
+    // Setlist
+    ..get('/eventos/<eventoId>/setlist/', sl.setlistController.getSetlist)
+    ..put('/eventos/<eventoId>/setlist/', sl.setlistController.setSetlist)
+    // Locais
+    ..mount('/locais/', sl.localController.router.call)
+    ..get('/meus-locais', sl.localController.meusLocaisHandler)
+    // Contexto do usuário
+    ..get('/meu-contexto', sl.contextoController.handler)
+    // Agenda / Bloqueios
+    ..mount('/agenda/', sl.bloqueioController.router.call)
+    // Conflitos
+    ..mount('/conflitos/', sl.conflitosController.router.call)
+    // Teleprompter
+    ..mount('/teleprompter/', sl.teleprompterController.router.call);
+
+  final protectedHandler = Pipeline()
+      .addMiddleware(authMiddleware())
+      .addHandler(protectedApi.call);
 
   final root = Router()
     ..get('/health/', _health)
-    ..mount('/api/v1/', api.call);
+    ..mount('/api/v1/auth/', sl.authController.router.call)
+    ..mount('/api/v1/', protectedHandler);
 
   final handler = Pipeline()
       .addMiddleware(corsMiddleware())
@@ -86,7 +89,6 @@ void main() async {
   final server = await io.serve(handler, cfg.host, cfg.port);
   Logger('Server').info('Rodando em http://${server.address.host}:${server.port}');
 
-  // SIGTERM não é suportado no Windows; só registra em plataformas Unix (produção no Render)
   if (!Platform.isWindows) {
     ProcessSignal.sigterm.watch().listen((_) async {
       await sl.close();

@@ -3,10 +3,11 @@ import 'package:minha_banda_flutter/main.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
-  testWidgets('app smoke test — renderiza sem crash', (tester) async {
+  testWidgets('app smoke test — abre tela de login sem crash', (tester) async {
     await tester.pumpWidget(
       const ProviderScope(child: MinhaBandaApp()),
     );
-    expect(find.text('Agenda'), findsOneWidget);
+    await tester.pumpAndSettle();
+    expect(find.text('Entrar'), findsOneWidget);
   });
 }

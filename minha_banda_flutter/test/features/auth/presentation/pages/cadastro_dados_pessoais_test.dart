@@ -133,11 +133,14 @@ void main() {
             nomeArtistico: 'Carlos Santana',
             email: 'carlos@test.com',
             senha: 'senha123',
-          )).thenAnswer((_) async => const AppUser(
-            id: 'usr_1',
-            nomeArtistico: 'Carlos Santana',
-            email: 'carlos@test.com',
-          ));
+          )).thenAnswer((_) async => (
+                user: const AppUser(
+                  id: 'usr_1',
+                  nomeArtistico: 'Carlos Santana',
+                  email: 'carlos@test.com',
+                ),
+                token: 'tok',
+              ));
 
       await tester.pumpApp(
         Navigator(

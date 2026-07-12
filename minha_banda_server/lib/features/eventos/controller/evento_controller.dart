@@ -11,30 +11,22 @@ class EventoController {
   EventoController(this._service);
   final EventoService _service;
 
-  /// Montado em /bandas/<bandaId>/eventos/
-  Router get bandaRouter {
-    final r = Router();
-    r.get('/', _listar);
-    r.post('/', _criar);
-    return r;
-  }
-
   /// Montado em /eventos/
   Router get router {
     final r = Router();
-    r.get('/<id>', _buscar);
-    r.put('/<id>', _atualizar);
-    r.delete('/<id>', _deletar);
+    r.get('/<id>', buscar);
+    r.put('/<id>', atualizar);
+    r.delete('/<id>', deletar);
     return r;
   }
 
-  Future<Response> _listar(Request request, String bandaId) async {
+  Future<Response> listar(Request request, String bandaId) async {
     final status = request.url.queryParameters['status'];
     final eventos = await _service.listarByBanda(bandaId, status: status);
     return ResponseHelper.ok(eventos.map((e) => e.toJson()).toList());
   }
 
-  Future<Response> _criar(Request request, String bandaId) async {
+  Future<Response> criar(Request request, String bandaId) async {
     final userId = request.userId;
     final body = await RequestHelper.parseBody(request);
 
@@ -61,12 +53,12 @@ class EventoController {
     return ResponseHelper.created({'evento': evento.toJson()});
   }
 
-  Future<Response> _buscar(Request request, String id) async {
+  Future<Response> buscar(Request request, String id) async {
     final evento = await _service.buscarPorId(id);
     return ResponseHelper.ok({'evento': evento.toJson()});
   }
 
-  Future<Response> _atualizar(Request request, String id) async {
+  Future<Response> atualizar(Request request, String id) async {
     final body = await RequestHelper.parseBody(request);
 
     final titulo = body['titulo'] as String?;
@@ -91,7 +83,7 @@ class EventoController {
     return ResponseHelper.ok({'evento': evento.toJson()});
   }
 
-  Future<Response> _deletar(Request request, String id) async {
+  Future<Response> deletar(Request request, String id) async {
     await _service.deletar(id);
     return ResponseHelper.noContent();
   }
@@ -102,29 +94,13 @@ class EventoActionsController {
   EventoActionsController(this._service);
   final EventoService _service;
 
-  Router get confirmacaoRouter {
-    final r = Router();
-    r.get('/', _listarConfirmacoes);
-    r.post('/', _confirmar);
-    return r;
-  }
-
-  Router get checklistRouter {
-    final r = Router();
-    r.get('/', _listarChecklist);
-    r.post('/', _addItem);
-    r.put('/<itemId>', _toggleItem);
-    r.delete('/<itemId>', _deleteItem);
-    return r;
-  }
-
-  Future<Response> _listarConfirmacoes(
+  Future<Response> listarConfirmacoes(
       Request request, String eventoId) async {
     final lista = await _service.listarConfirmacoes(eventoId);
     return ResponseHelper.ok(lista.map((c) => c.toJson()).toList());
   }
 
-  Future<Response> _confirmar(Request request, String eventoId) async {
+  Future<Response> confirmar(Request request, String eventoId) async {
     final userId = request.userId;
     final body = await RequestHelper.parseBody(request);
     final status = body['status'] as String? ?? '';
@@ -138,12 +114,12 @@ class EventoActionsController {
     return ResponseHelper.ok({'message': 'Confirmação registrada.'});
   }
 
-  Future<Response> _listarChecklist(Request request, String eventoId) async {
+  Future<Response> listarChecklist(Request request, String eventoId) async {
     final lista = await _service.listarChecklist(eventoId);
     return ResponseHelper.ok(lista.map((i) => i.toJson()).toList());
   }
 
-  Future<Response> _addItem(Request request, String eventoId) async {
+  Future<Response> addItem(Request request, String eventoId) async {
     final body = await RequestHelper.parseBody(request);
     final descricao = body['descricao'] as String? ?? '';
     final item = await _service.addChecklistItem(
@@ -151,7 +127,7 @@ class EventoActionsController {
     return ResponseHelper.created({'item': item.toJson()});
   }
 
-  Future<Response> _toggleItem(
+  Future<Response> toggleItem(
       Request request, String eventoId, String itemId) async {
     final body = await RequestHelper.parseBody(request);
     final concluido = body['concluido'] as bool? ?? false;
@@ -159,7 +135,7 @@ class EventoActionsController {
     return ResponseHelper.ok({'message': 'Item atualizado.'});
   }
 
-  Future<Response> _deleteItem(
+  Future<Response> deleteItem(
       Request request, String eventoId, String itemId) async {
     await _service.deleteChecklistItem(itemId);
     return ResponseHelper.noContent();

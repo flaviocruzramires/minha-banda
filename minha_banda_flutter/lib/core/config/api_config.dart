@@ -1,9 +1,11 @@
-/// URL base da API. Troque por String.fromEnvironment ou flavor para produção.
-///
-/// Dev local:  http://10.0.2.2:8080  (Android emulador → localhost do host)
-///             http://localhost:8080  (web / iOS simulator)
-/// Produção:   https://api.minha-banda.com.br
-const String kApiBaseUrl = String.fromEnvironment(
-  'API_BASE_URL',
-  defaultValue: 'http://10.0.2.2:8080',
-);
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
+
+/// URL base da API. Sobrescrita via --dart-define=API_BASE_URL=... em produção.
+String get kApiBaseUrl {
+  const envUrl = String.fromEnvironment('API_BASE_URL');
+  if (envUrl.isNotEmpty) return envUrl;
+  if (kIsWeb) return 'http://localhost:8081';
+  if (!kIsWeb && Platform.isAndroid) return 'http://10.0.2.2:8081';
+  return 'http://localhost:8081'; // Windows, macOS, iOS simulator
+}

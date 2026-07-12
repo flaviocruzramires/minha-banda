@@ -17,5 +17,5 @@ abstract interface class RepertorioRepository {
     required String status,
   });
   Future<Musica> atualizar(Musica musica);
-  Future<void> deletar(String id);
+  Future<void> deletar(String bandaId, String id);
 }

@@ -1,9 +1,16 @@
 import '../entities/app_user.dart';
 import '../../../bandas/domain/entities/banda.dart';
 
+typedef AuthResult = ({AppUser user, String token});
+
 abstract interface class AuthRepository {
-  Future<AppUser> cadastrar({
+  Future<AuthResult> cadastrar({
     required String nomeArtistico,
+    required String email,
+    required String senha,
+  });
+
+  Future<AuthResult> login({
     required String email,
     required String senha,
   });

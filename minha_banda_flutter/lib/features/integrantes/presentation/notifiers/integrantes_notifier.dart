@@ -76,10 +76,10 @@ class IntegrantesNotifier extends StateNotifier<IntegrantesState> {
     }
   }
 
-  Future<void> remover(String id) async {
+  Future<void> remover(Integrante integrante) async {
     try {
-      await _repo.remover(id);
-      state = state.copyWith(integrantes: state.integrantes.where((i) => i.id != id).toList());
+      await _repo.remover(integrante);
+      state = state.copyWith(integrantes: state.integrantes.where((i) => i.id != integrante.id).toList());
     } catch (_) {
       state = state.copyWith(status: IntegrantesStatus.error, erro: 'Erro ao remover integrante.');
     }

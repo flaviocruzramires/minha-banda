@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/providers/auth_token_provider.dart';
 import '../../data/repositories/http_auth_repository.dart';
 import '../../data/repositories/mock_auth_repository.dart'
     show EmailJaCadastradoException, NomeBandaEmUsoException;
@@ -75,7 +76,7 @@ final authRepositoryProvider = Provider<AuthRepository>(
 
 final cadastroNotifierProvider =
     StateNotifierProvider<CadastroNotifier, CadastroState>(
-  (ref) => CadastroNotifier(ref.watch(authRepositoryProvider)),
+  (ref) => CadastroNotifier(ref.watch(authRepositoryProvider), ref),
 );
 
 // ---------------------------------------------------------------------------
@@ -83,9 +84,10 @@ final cadastroNotifierProvider =
 // ---------------------------------------------------------------------------
 
 class CadastroNotifier extends StateNotifier<CadastroState> {
-  CadastroNotifier(this._repo) : super(const CadastroState());
+  CadastroNotifier(this._repo, this._ref) : super(const CadastroState());
 
   final AuthRepository _repo;
+  final Ref _ref;
 
   Future<bool> cadastrarUsuario({
     required String nomeArtistico,
@@ -94,12 +96,14 @@ class CadastroNotifier extends StateNotifier<CadastroState> {
   }) async {
     state = state.copyWith(status: CadastroStatus.loading);
     try {
-      final user = await _repo.cadastrar(
+      final result = await _repo.cadastrar(
         nomeArtistico: nomeArtistico,
         email: email,
         senha: senha,
       );
-      state = state.copyWith(status: CadastroStatus.success, usuario: user);
+      await _ref.read(authTokenProvider.notifier).setToken(result.token);
+      state = state.copyWith(
+          status: CadastroStatus.success, usuario: result.user);
       return true;
     } on EmailJaCadastradoException {
       state = state.copyWith(
@@ -107,10 +111,16 @@ class CadastroNotifier extends StateNotifier<CadastroState> {
         erro: 'Este e-mail já está cadastrado.',
       );
       return false;
-    } catch (_) {
+    } on HttpRepositoryException catch (e) {
       state = state.copyWith(
         status: CadastroStatus.error,
-        erro: 'Erro ao criar conta. Tente novamente.',
+        erro: e.message,
+      );
+      return false;
+    } catch (e) {
+      state = state.copyWith(
+        status: CadastroStatus.error,
+        erro: 'Sem conexão com o servidor. Verifique sua rede.',
       );
       return false;
     }
@@ -147,10 +157,16 @@ class CadastroNotifier extends StateNotifier<CadastroState> {
         erro: 'Esse nome de banda já está em uso.',
       );
       return false;
-    } catch (_) {
+    } on HttpRepositoryException catch (e) {
       state = state.copyWith(
         status: CadastroStatus.error,
-        erro: 'Erro ao criar banda. Tente novamente.',
+        erro: e.message,
+      );
+      return false;
+    } catch (e) {
+      state = state.copyWith(
+        status: CadastroStatus.error,
+        erro: 'Sem conexão com o servidor. Verifique sua rede.',
       );
       return false;
     }
