@@ -59,6 +59,13 @@ class _EventoDetalhePageState extends ConsumerState<EventoDetalhePage> {
           backgroundColor: AppColors.stageBlack2,
           title: Text(evento?.titulo ?? 'Evento', style: const TextStyle(color: AppColors.warmWhite)),
           iconTheme: const IconThemeData(color: AppColors.warmWhite),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.play_circle_outline, color: AppColors.spotlight),
+              tooltip: 'Teleprompter',
+              onPressed: evento == null ? null : () => context.push('/teleprompter/${evento?.id}'),
+            ),
+          ],
           bottom: const TabBar(
             labelColor: AppColors.spotlight,
             unselectedLabelColor: AppColors.bodyText,

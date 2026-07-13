@@ -1,5 +1,4 @@
 import 'package:shelf/shelf.dart';
-import 'package:shelf_router/shelf_router.dart';
 import '../../../core/helpers/request_helper.dart';
 import '../../../core/helpers/response_helper.dart';
 import '../../../core/middleware/auth_middleware.dart';
@@ -8,15 +7,6 @@ import '../service/musica_service.dart';
 class MusicaController {
   MusicaController(this._service);
   final MusicaService _service;
-
-  /// Rotas sem parâmetro de banda (buscar/atualizar/deletar por id)
-  Router get router {
-    final r = Router();
-    r.get('/<id>', buscar);
-    r.put('/<id>', atualizar);
-    r.delete('/<id>', deletar);
-    return r;
-  }
 
   Future<Response> listar(Request req, String bandaId) async {
     final musicas = await _service.listarByBanda(bandaId);
@@ -57,12 +47,12 @@ class MusicaController {
     return ResponseHelper.created({'musica': musica.toJson()});
   }
 
-  Future<Response> buscar(Request req, String id) async {
+  Future<Response> buscar(Request req, String bandaId, String id) async {
     final musica = await _service.buscarPorId(id);
     return ResponseHelper.ok({'musica': musica.toJson()});
   }
 
-  Future<Response> atualizar(Request req, String id) async {
+  Future<Response> atualizar(Request req, String bandaId, String id) async {
     final userId = req.userId;
     final body = await RequestHelper.parseBody(req);
 
@@ -84,7 +74,7 @@ class MusicaController {
     return ResponseHelper.ok({'musica': musica.toJson()});
   }
 
-  Future<Response> deletar(Request req, String id) async {
+  Future<Response> deletar(Request req, String bandaId, String id) async {
     final userId = req.userId;
     await _service.deletar(id: id, userId: userId);
     return ResponseHelper.noContent();

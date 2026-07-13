@@ -37,7 +37,7 @@ class PostgresIntegrantesRepository implements IntegrantesRepository {
       ),
       parameters: {'banda': bandaId},
     );
-    return rows.map((r) => r.toColumnMap()).toList();
+    return rows.map(_toMap).toList();
   }
 
   @override
@@ -57,7 +57,7 @@ class PostgresIntegrantesRepository implements IntegrantesRepository {
       parameters: {'banda': bandaId, 'user': userId},
     );
     if (rows.isEmpty) return null;
-    return rows.first.toColumnMap();
+    return _toMap(rows.first);
   }
 
   @override
@@ -101,5 +101,20 @@ class PostgresIntegrantesRepository implements IntegrantesRepository {
       ),
       parameters: {'banda': bandaId, 'user': userId},
     );
+  }
+
+  Map<String, dynamic> _toMap(ResultRow row) {
+    final c = row.toColumnMap();
+    return {
+      'id': c['id'],
+      'userId': c['user_id'],
+      'bandaId': c['banda_id'],
+      'papel': c['papel'],
+      'instrumento': c['instrumento'],
+      'apelido': c['apelido'],
+      'telefone': c['telefone'],
+      'nomeArtistico': c['nome_artistico'],
+      'email': c['email'],
+    };
   }
 }
