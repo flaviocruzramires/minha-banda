@@ -7,18 +7,20 @@ import '../../features/agenda/presentation/pages/agenda_page.dart';
 import '../../features/agenda/presentation/pages/novo_bloqueio_page.dart';
 import '../../features/auth/presentation/pages/cadastro_dados_pessoais_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
-import '../../features/contexto/domain/entities/vinculo_contexto.dart';
 import '../../features/contexto/presentation/notifiers/contexto_notifier.dart';
 import '../../features/contexto/presentation/pages/seletor_contexto_page.dart';
+import '../../features/eventos/domain/entities/evento.dart';
 import '../../features/eventos/presentation/pages/evento_detalhe_page.dart';
 import '../../features/eventos/presentation/pages/evento_form_page.dart';
 import '../../features/eventos/presentation/pages/eventos_lista_page.dart';
+import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/integrantes/domain/entities/integrante.dart';
 import '../../features/integrantes/presentation/pages/integrante_perfil_page.dart';
 import '../../features/integrantes/presentation/pages/integrantes_lista_page.dart';
 import '../../features/locais/domain/entities/local.dart';
 import '../../features/locais/presentation/pages/local_form_page.dart';
 import '../../features/locais/presentation/pages/locais_lista_page.dart';
+import '../../features/mais/presentation/pages/mais_page.dart';
 import '../../features/repertorio/domain/entities/musica.dart';
 import '../../features/repertorio/presentation/pages/musica_form_page.dart';
 import '../../features/repertorio/presentation/pages/repertorio_lista_page.dart';
@@ -27,7 +29,7 @@ import '../../features/teleprompter/presentation/pages/teleprompter_page.dart';
 import '../providers/auth_token_provider.dart';
 
 // ---------------------------------------------------------------------------
-// RouterNotifier — liga mudanças no token e contexto ao GoRouter
+// RouterNotifier
 // ---------------------------------------------------------------------------
 
 class RouterNotifier extends ChangeNotifier {
@@ -81,12 +83,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const SeletorContextoPage(),
       ),
 
-      // Shell principal com bottom navigation
+      // Shell principal com bottom navigation (4 abas)
       ShellRoute(
         builder: (context, state, child) => AppShell(child: child),
         routes: [
           GoRoute(
             path: '/',
+            builder: (context, state) => const HomePage(),
+          ),
+          GoRoute(
+            path: '/agenda',
             builder: (context, state) => const AgendaPage(),
           ),
           GoRoute(
@@ -94,6 +100,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) =>
                 EventosListaPage(bandaId: state.pathParameters['bandaId']!),
           ),
+          GoRoute(
+            path: '/mais',
+            builder: (context, state) => const MaisPage(),
+          ),
+          // Rotas do Mais (sub-navegação mantida no shell para manter contexto)
           GoRoute(
             path: '/repertorio/:bandaId',
             builder: (context, state) =>
@@ -119,8 +130,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/evento-form/:bandaId',
-        builder: (context, state) =>
-            EventoFormPage(bandaId: state.pathParameters['bandaId']!),
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          final evento = extra?['evento'] as Evento?;
+          return EventoFormPage(
+            bandaId: state.pathParameters['bandaId']!,
+            evento: evento,
+          );
+        },
       ),
       GoRoute(
         path: '/setlist/:eventoId',

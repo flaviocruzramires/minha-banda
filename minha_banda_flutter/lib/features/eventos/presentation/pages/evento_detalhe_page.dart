@@ -61,9 +61,19 @@ class _EventoDetalhePageState extends ConsumerState<EventoDetalhePage> {
           iconTheme: const IconThemeData(color: AppColors.warmWhite),
           actions: [
             IconButton(
+              icon: const Icon(Icons.edit_outlined, color: AppColors.warmWhite),
+              tooltip: 'Editar evento',
+              onPressed: evento == null
+                  ? null
+                  : () => context.push(
+                        '/evento-form/${evento.bandaId}',
+                        extra: {'evento': evento},
+                      ),
+            ),
+            IconButton(
               icon: const Icon(Icons.play_circle_outline, color: AppColors.spotlight),
               tooltip: 'Teleprompter',
-              onPressed: evento == null ? null : () => context.push('/teleprompter/${evento?.id}'),
+              onPressed: evento == null ? null : () => context.push('/teleprompter/${evento.id}'),
             ),
           ],
           bottom: const TabBar(

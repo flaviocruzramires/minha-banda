@@ -20,7 +20,7 @@ class HttpSetlistRepository implements SetlistRepository {
   @override
   Future<List<String>> getSetlistIds(String eventoId) async {
     final res = await _client.get(
-      Uri.parse('$_base/api/v1/eventos/$eventoId/setlist'),
+      Uri.parse('$_base/api/v1/eventos/$eventoId/setlist/'),
       headers: _headers,
     );
     _assertOk(res);
@@ -34,7 +34,7 @@ class HttpSetlistRepository implements SetlistRepository {
   @override
   Future<void> setSetlist({required String eventoId, required List<String> musicaIds}) async {
     final res = await _client.put(
-      Uri.parse('$_base/api/v1/eventos/$eventoId/setlist'),
+      Uri.parse('$_base/api/v1/eventos/$eventoId/setlist/'),
       headers: _headers,
       body: jsonEncode({'musicaIds': musicaIds}),
     );

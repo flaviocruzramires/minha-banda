@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/loading_overlay.dart';
@@ -51,7 +52,32 @@ class _AgendaPageState extends ConsumerState<AgendaPage> {
 
     return Scaffold(
       backgroundColor: AppColors.stageBlack,
-      body: state.isLoading
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Agenda',
+                    style: GoogleFonts.bebasNeue(
+                      fontSize: 28,
+                      color: AppColors.warmWhite,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.add, color: AppColors.warmWhite),
+                    onPressed: () => context.push('/novo-bloqueio'),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: state.isLoading
           ? const LoadingOverlay()
           : items.isEmpty
               ? const EmptyState(
@@ -87,11 +113,9 @@ class _AgendaPageState extends ConsumerState<AgendaPage> {
                     ],
                   ],
                 ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.spotlight,
-        foregroundColor: AppColors.stageBlack,
-        onPressed: () => context.push('/novo-bloqueio'),
-        child: const Icon(Icons.add),
+            ),
+          ],
+        ),
       ),
     );
   }

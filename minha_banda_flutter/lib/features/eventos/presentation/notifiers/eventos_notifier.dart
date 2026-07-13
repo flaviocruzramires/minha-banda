@@ -116,6 +116,18 @@ class EventosNotifier extends StateNotifier<EventosState> {
     }
   }
 
+  Future<void> atualizar(Evento evento) async {
+    try {
+      final atualizado = await _repo.atualizar(evento);
+      state = state.copyWith(
+        eventos: state.eventos.map((e) => e.id == atualizado.id ? atualizado : e).toList(),
+        eventoSelecionado: atualizado,
+      );
+    } catch (_) {
+      state = state.copyWith(status: EventosStatus.error, erro: 'Erro ao atualizar evento.');
+    }
+  }
+
   Future<void> confirmarPresenca({required String eventoId, required String userId, required String confirmStatus}) async {
     try {
       final conf = await _repo.confirmarPresenca(eventoId: eventoId, userId: userId, status: confirmStatus);

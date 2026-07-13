@@ -3,12 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../notifiers/eventos_notifier.dart';
+import '../../domain/entities/evento.dart';
 import '../../../conflitos/domain/entities/conflito.dart';
 import '../../../conflitos/presentation/notifiers/conflitos_notifier.dart';
 
 class EventoFormPage extends ConsumerStatefulWidget {
-  const EventoFormPage({super.key, required this.bandaId});
+  const EventoFormPage({super.key, required this.bandaId, this.evento});
   final String bandaId;
+  final Evento? evento;
 
   @override
   ConsumerState<EventoFormPage> createState() => _EventoFormPageState();
@@ -16,13 +18,27 @@ class EventoFormPage extends ConsumerStatefulWidget {
 
 class _EventoFormPageState extends ConsumerState<EventoFormPage> {
   final _formKey = GlobalKey<FormState>();
-  final _titulo = TextEditingController();
-  final _notas = TextEditingController();
-  String _tipo = 'show';
-  String _status = 'proposto';
-  DateTime _dataHoraInicio = DateTime.now().add(const Duration(days: 1));
-  DateTime _dataHoraFim = DateTime.now().add(const Duration(days: 1, hours: 2));
+  late final TextEditingController _titulo;
+  late final TextEditingController _notas;
+  late String _tipo;
+  late String _status;
+  late DateTime _dataHoraInicio;
+  late DateTime _dataHoraFim;
   bool _salvando = false;
+
+  bool get _editando => widget.evento != null;
+
+  @override
+  void initState() {
+    super.initState();
+    final e = widget.evento;
+    _titulo = TextEditingController(text: e?.titulo ?? '');
+    _notas = TextEditingController(text: e?.notas ?? '');
+    _tipo = e?.tipo ?? 'show';
+    _status = e?.status ?? 'proposto';
+    _dataHoraInicio = e?.dataHoraInicio ?? DateTime.now().add(const Duration(days: 1));
+    _dataHoraFim = e?.dataHoraFim ?? _dataHoraInicio.add(const Duration(hours: 2));
+  }
 
   @override
   void dispose() {
@@ -73,30 +89,45 @@ class _EventoFormPageState extends ConsumerState<EventoFormPage> {
   Future<void> _salvar() async {
     if (!_formKey.currentState!.validate()) return;
 
-    // Verificar conflitos antes de salvar
-    final conflitos = await ref.read(conflitosNotifierProvider.notifier).verificar(
-          bandaId: widget.bandaId,
-          inicio: _dataHoraInicio,
-          fim: _dataHoraFim,
-        );
-
-    if (conflitos.isNotEmpty && mounted) {
-      final continuar = await _mostrarDialogConflitos(conflitos);
-      if (!continuar) return;
+    if (!_editando) {
+      final conflitos = await ref.read(conflitosNotifierProvider.notifier).verificar(
+            bandaId: widget.bandaId,
+            inicio: _dataHoraInicio,
+            fim: _dataHoraFim,
+          );
+      if (conflitos.isNotEmpty && mounted) {
+        final continuar = await _mostrarDialogConflitos(conflitos);
+        if (!continuar) return;
+      }
     }
 
     if (!mounted) return;
     setState(() => _salvando = true);
     try {
-      await ref.read(eventosNotifierProvider.notifier).criar(
-            bandaId: widget.bandaId,
-            tipo: _tipo,
-            titulo: _titulo.text.trim(),
-            dataHoraInicio: _dataHoraInicio,
-            dataHoraFim: _dataHoraFim,
-            status: _status,
-            notas: _notas.text.trim().isEmpty ? null : _notas.text.trim(),
-          );
+      if (_editando) {
+        final atualizado = Evento(
+          id: widget.evento!.id,
+          bandaId: widget.evento!.bandaId,
+          tipo: _tipo,
+          titulo: _titulo.text.trim(),
+          dataHoraInicio: _dataHoraInicio,
+          dataHoraFim: _dataHoraFim,
+          status: _status,
+          notas: _notas.text.trim().isEmpty ? null : _notas.text.trim(),
+          localId: widget.evento!.localId,
+        );
+        await ref.read(eventosNotifierProvider.notifier).atualizar(atualizado);
+      } else {
+        await ref.read(eventosNotifierProvider.notifier).criar(
+              bandaId: widget.bandaId,
+              tipo: _tipo,
+              titulo: _titulo.text.trim(),
+              dataHoraInicio: _dataHoraInicio,
+              dataHoraFim: _dataHoraFim,
+              status: _status,
+              notas: _notas.text.trim().isEmpty ? null : _notas.text.trim(),
+            );
+      }
       if (mounted) context.pop();
     } finally {
       if (mounted) setState(() => _salvando = false);
@@ -181,7 +212,8 @@ class _EventoFormPageState extends ConsumerState<EventoFormPage> {
       backgroundColor: AppColors.stageBlack,
       appBar: AppBar(
         backgroundColor: AppColors.stageBlack2,
-        title: const Text('Novo Evento', style: TextStyle(color: AppColors.warmWhite)),
+        title: Text(_editando ? 'Editar Evento' : 'Novo Evento',
+            style: const TextStyle(color: AppColors.warmWhite)),
         iconTheme: const IconThemeData(color: AppColors.warmWhite),
       ),
       body: Form(
@@ -249,7 +281,7 @@ class _EventoFormPageState extends ConsumerState<EventoFormPage> {
               onPressed: _salvando ? null : _salvar,
               child: _salvando
                   ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.stageBlack))
-                  : const Text('Criar'),
+                  : Text(_editando ? 'Salvar' : 'Criar'),
             ),
           ],
         ),
