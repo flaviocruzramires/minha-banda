@@ -6,6 +6,6 @@ String get kApiBaseUrl {
   const envUrl = String.fromEnvironment('API_BASE_URL');
   if (envUrl.isNotEmpty) return envUrl;
   if (kIsWeb) return 'http://localhost:8081';
-  if (!kIsWeb && Platform.isAndroid) return 'http://10.0.2.2:8081';
+  if (!kIsWeb && Platform.isAndroid) return 'http://192.168.101.6:8081';
   return 'http://localhost:8081'; // Windows, macOS, iOS simulator
 }
