@@ -253,8 +253,8 @@ class PostgresMusicaRepository implements MusicaRepository {
       titulo: c['titulo'] as String,
       artistaOriginal: c['artista_original'] as String?,
       tonalidade: c['tonalidade'] as String?,
-      bpm: c['bpm'] as int?,
-      duracaoSeg: c['duracao_seg'] as int?,
+      bpm: (c['bpm'] as num?)?.toInt(),
+      duracaoSeg: (c['duracao_seg'] as num?)?.toInt(),
       tags: (c['tags'] as List).cast<String>(),
       letra: c['letra'] as String?,
       cifra: c['cifra'] as String?,
@@ -262,8 +262,8 @@ class PostgresMusicaRepository implements MusicaRepository {
       notasArranjo: c['notas_arranjo'] as String?,
       status: c['status'] as String,
       criadoPor: c['criado_por'] as String,
-      criadoEm: c['criado_em'] as DateTime,
-      atualizadoEm: c['atualizado_em'] as DateTime,
+      criadoEm: _dt(c['criado_em']),
+      atualizadoEm: _dt(c['atualizado_em']),
     );
   }
 
@@ -273,7 +273,10 @@ class PostgresMusicaRepository implements MusicaRepository {
       id: c['id'] as String,
       eventoId: c['evento_id'] as String,
       musicaId: c['musica_id'] as String,
-      posicao: c['posicao'] as int,
+      posicao: (c['posicao'] as num).toInt(),
     );
   }
 }
+
+DateTime _dt(dynamic v) =>
+    v is DateTime ? v : DateTime.parse(v.toString());

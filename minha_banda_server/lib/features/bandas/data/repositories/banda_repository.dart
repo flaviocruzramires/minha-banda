@@ -22,6 +22,12 @@ abstract interface class BandaRepository {
     required String token,
   });
   Future<bool> isMembro(String bandaId, String userId);
+  Future<Banda> update({
+    required String bandaId,
+    String? nome,
+    String? generoMusical,
+    String? cidade,
+  });
 }
 
 class PostgresBandaRepository implements BandaRepository {
@@ -122,16 +128,60 @@ class PostgresBandaRepository implements BandaRepository {
     return rows.isNotEmpty;
   }
 
+  @override
+  Future<Banda> update({
+    required String bandaId,
+    String? nome,
+    String? generoMusical,
+    String? cidade,
+  }) async {
+    final sets = <String>[];
+    final params = <String, dynamic>{'id': bandaId};
+
+    if (nome != null && nome.trim().isNotEmpty) {
+      sets.add('nome = @nome');
+      params['nome'] = nome.trim();
+    }
+    if (generoMusical != null) {
+      sets.add('genero_musical = @genero');
+      params['genero'] = generoMusical.trim();
+    }
+    if (cidade != null) {
+      sets.add('cidade = @cidade');
+      params['cidade'] = cidade.trim();
+    }
+
+    if (sets.isEmpty) {
+      final rows = await _conn.execute(
+        Sql.named('SELECT id, nome, genero_musical, cidade, cor_hex, criado_por, criado_em FROM bandas WHERE id = @id'),
+        parameters: {'id': bandaId},
+      );
+      return _fromRow(rows.first);
+    }
+
+    final rows = await _conn.execute(
+      Sql.named(
+        'UPDATE bandas SET ${sets.join(', ')} WHERE id = @id '
+        'RETURNING id, nome, genero_musical, cidade, cor_hex, criado_por, criado_em',
+      ),
+      parameters: params,
+    );
+    return _fromRow(rows.first);
+  }
+
   Banda _fromRow(ResultRow row) {
     final c = row.toColumnMap();
     return Banda(
-      id: c['id'] as String,
+      id: c['id'].toString(),
       nome: c['nome'] as String,
       generoMusical: c['genero_musical'] as String,
       cidade: c['cidade'] as String,
-      corHex: c['cor_hex'] as int,
-      criadoPor: c['criado_por'] as String,
-      criadoEm: c['criado_em'] as DateTime,
+      corHex: (c['cor_hex'] as num).toInt(),
+      criadoPor: c['criado_por'].toString(),
+      criadoEm: _dt(c['criado_em']),
     );
   }
 }
+
+DateTime _dt(dynamic v) =>
+    v is DateTime ? v : DateTime.parse(v.toString());

@@ -235,13 +235,16 @@ class PostgresLocalRepository implements LocalRepository {
       endereco: c['endereco'] as String?,
       cidade: c['cidade'] as String,
       tipo: c['tipo'] as String,
-      capacidade: c['capacidade'] as int?,
+      capacidade: (c['capacidade'] as num?)?.toInt(),
       contato: c['contato'] as String?,
       temSom: c['tem_som'] as bool,
       temCamarim: c['tem_camarim'] as bool,
       notas: c['notas'] as String?,
       criadoPor: c['criado_por'] as String,
-      criadoEm: c['criado_em'] as DateTime,
+      criadoEm: _dt(c['criado_em']),
     );
   }
 }
+
+DateTime _dt(dynamic v) =>
+    v is DateTime ? v : DateTime.parse(v.toString());

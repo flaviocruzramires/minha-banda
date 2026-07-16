@@ -23,6 +23,8 @@ abstract interface class EventoRepository {
     String? localId,
     String? status,
     String? notas,
+    double? valorCache,
+    bool clearValorCache = false,
   });
   Future<void> delete(String id);
 
@@ -121,6 +123,8 @@ class PostgresEventoRepository implements EventoRepository {
     String? localId,
     String? status,
     String? notas,
+    double? valorCache,
+    bool clearValorCache = false,
   }) async {
     final sets = <String>[];
     final params = <String, dynamic>{'id': id};
@@ -152,6 +156,12 @@ class PostgresEventoRepository implements EventoRepository {
     if (notas != null) {
       sets.add('notas = @notas');
       params['notas'] = notas;
+    }
+    if (clearValorCache) {
+      sets.add('valor_cache = NULL');
+    } else if (valorCache != null) {
+      sets.add('valor_cache = @valorCache');
+      params['valorCache'] = valorCache;
     }
     sets.add('atualizado_em = now()');
 
@@ -302,14 +312,18 @@ class PostgresEventoRepository implements EventoRepository {
       bandaId: c['banda_id'] as String,
       tipo: c['tipo'] as String,
       titulo: c['titulo'] as String,
-      dataHoraInicio: c['data_hora_inicio'] as DateTime,
-      dataHoraFim: c['data_hora_fim'] as DateTime?,
+      dataHoraInicio: _dt(c['data_hora_inicio']),
+      dataHoraFim: c['data_hora_fim'] != null ? _dt(c['data_hora_fim']) : null,
       localId: c['local_id'] as String?,
       status: c['status'] as String,
       notas: c['notas'] as String?,
+      valorCache: (c['valor_cache'] as num?)?.toDouble(),
       criadoPor: c['criado_por'] as String,
-      criadoEm: c['criado_em'] as DateTime,
-      atualizadoEm: c['atualizado_em'] as DateTime,
+      criadoEm: _dt(c['criado_em']),
+      atualizadoEm: _dt(c['atualizado_em']),
     );
   }
 }
+
+DateTime _dt(dynamic v) =>
+    v is DateTime ? v : DateTime.parse(v.toString());

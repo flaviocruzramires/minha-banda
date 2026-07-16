@@ -100,9 +100,12 @@ class PostgresBloqueioRepository implements BloqueioRepository {
       id: c['id'] as String,
       userId: c['user_id'] as String,
       titulo: c['titulo'] as String,
-      dataHoraInicio: c['data_hora_inicio'] as DateTime,
-      dataHoraFim: c['data_hora_fim'] as DateTime,
-      criadoEm: c['criado_em'] as DateTime,
+      dataHoraInicio: _dt(c['data_hora_inicio']),
+      dataHoraFim: _dt(c['data_hora_fim']),
+      criadoEm: _dt(c['criado_em']),
     );
   }
 }
+
+DateTime _dt(dynamic v) =>
+    v is DateTime ? v : DateTime.parse(v.toString());

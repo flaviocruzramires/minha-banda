@@ -9,6 +9,7 @@ abstract interface class UserRepository {
     required String email,
     required String senhaHash,
   });
+  Future<AppUser> updateNome({required String userId, required String nomeArtistico});
 }
 
 class PostgresUserRepository implements UserRepository {
@@ -51,6 +52,18 @@ class PostgresUserRepository implements UserRepository {
     return _fromRow(rows.first);
   }
 
+  @override
+  Future<AppUser> updateNome({required String userId, required String nomeArtistico}) async {
+    final rows = await _conn.execute(
+      Sql.named(
+        'UPDATE users SET nome_artistico = @nome WHERE id = @id '
+        'RETURNING id, nome_artistico, email, senha_hash, criado_em',
+      ),
+      parameters: {'id': userId, 'nome': nomeArtistico.trim()},
+    );
+    return _fromRow(rows.first);
+  }
+
   AppUser _fromRow(ResultRow row) {
     final cols = row.toColumnMap();
     return AppUser(
@@ -58,7 +71,10 @@ class PostgresUserRepository implements UserRepository {
       nomeArtistico: cols['nome_artistico'] as String,
       email: cols['email'] as String,
       senhaHash: cols['senha_hash'] as String,
-      criadoEm: cols['criado_em'] as DateTime,
+      criadoEm: _dt(cols['criado_em']),
     );
   }
 }
+
+DateTime _dt(dynamic v) =>
+    v is DateTime ? v : DateTime.parse(v.toString());
