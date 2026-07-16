@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS bandas (
   nome           TEXT NOT NULL,
   genero_musical TEXT NOT NULL,
   cidade         TEXT NOT NULL,
-  cor_hex        INTEGER NOT NULL DEFAULT 0,
+  cor_hex        BIGINT NOT NULL DEFAULT 0,
   criado_por     UUID NOT NULL REFERENCES users(id),
   criado_em      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
