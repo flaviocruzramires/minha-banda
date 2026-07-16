@@ -1,4 +1,4 @@
-import 'package:postgres/postgres.dart';
+﻿import 'package:postgres/postgres.dart';
 import 'package:uuid/uuid.dart';
 import '../../domain/entities/app_user.dart';
 
@@ -14,7 +14,7 @@ abstract interface class UserRepository {
 
 class PostgresUserRepository implements UserRepository {
   const PostgresUserRepository(this._conn);
-  final Connection _conn;
+  final Session _conn;
 
   @override
   Future<AppUser?> findByEmail(String email) async {

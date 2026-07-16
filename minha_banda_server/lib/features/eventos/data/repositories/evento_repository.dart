@@ -1,4 +1,4 @@
-import 'package:postgres/postgres.dart';
+﻿import 'package:postgres/postgres.dart';
 import 'package:uuid/uuid.dart';
 import '../../domain/entities/evento.dart';
 
@@ -28,7 +28,7 @@ abstract interface class EventoRepository {
   });
   Future<void> delete(String id);
 
-  // Confirmações
+  // ConfirmaÃ§Ãµes
   Future<List<EventoConfirmacao>> getConfirmacoes(String eventoId);
   Future<void> upsertConfirmacao({
     required String eventoId,
@@ -58,7 +58,7 @@ abstract interface class EventoRepository {
 
 class PostgresEventoRepository implements EventoRepository {
   const PostgresEventoRepository(this._conn);
-  final Connection _conn;
+  final Session _conn;
 
   @override
   Future<List<Evento>> listByBanda(String bandaId, {String? status}) async {

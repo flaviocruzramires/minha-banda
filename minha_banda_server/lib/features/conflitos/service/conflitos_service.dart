@@ -1,4 +1,4 @@
-import 'package:postgres/postgres.dart';
+﻿import 'package:postgres/postgres.dart';
 import '../../eventos/data/repositories/evento_repository.dart';
 import '../../agenda/data/repositories/bloqueio_repository.dart';
 
@@ -6,7 +6,7 @@ class ConflitosService {
   const ConflitosService(this._eventoRepo, this._bloqueioRepo, this._db);
   final EventoRepository _eventoRepo;
   final BloqueioRepository _bloqueioRepo;
-  final Connection _db;
+  final Session _db;
 
   /// Verifica conflitos para todos os membros de uma banda em uma data/hora.
   Future<List<Map<String, dynamic>>> verificarConflitosEvento({

@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 
 import 'package:postgres/postgres.dart';
 import 'package:uuid/uuid.dart';
@@ -21,7 +21,7 @@ abstract interface class NotificacaoRepository {
 
 class PostgresNotificacaoRepository implements NotificacaoRepository {
   const PostgresNotificacaoRepository(this._conn);
-  final Connection _conn;
+  final Session _conn;
 
   @override
   Future<List<Notificacao>> listarPorUsuario(String usuarioId, {int limit = 50}) async {

@@ -1,11 +1,11 @@
-import 'package:postgres/postgres.dart';
+﻿import 'package:postgres/postgres.dart';
 import 'package:shelf/shelf.dart';
 import '../../../core/helpers/response_helper.dart';
 import '../../../core/middleware/auth_middleware.dart';
 
 class ContextoController {
   ContextoController(this._db);
-  final Connection _db;
+  final Session _db;
 
   Future<Response> handler(Request request) async {
     final userId = request.userId;

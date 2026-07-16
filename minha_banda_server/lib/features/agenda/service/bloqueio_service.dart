@@ -1,4 +1,4 @@
-import 'package:postgres/postgres.dart';
+﻿import 'package:postgres/postgres.dart';
 import '../../../core/exceptions/app_exception.dart';
 import '../data/repositories/bloqueio_repository.dart';
 import '../domain/entities/bloqueio.dart';
@@ -8,7 +8,7 @@ class BloqueioService {
   // eventoRepo is kept for API compatibility; direct DB query is used for agenda
   const BloqueioService(this._bloqueioRepo, EventoRepository _, this._db);
   final BloqueioRepository _bloqueioRepo;
-  final Connection _db;
+  final Session _db;
 
   Future<List<Bloqueio>> listarBloqueios(String userId) =>
       _bloqueioRepo.listByUser(userId);
@@ -20,7 +20,7 @@ class BloqueioService {
     required String dataHoraFimStr,
   }) async {
     if (titulo.trim().isEmpty) {
-      throw const ValidationException('Título é obrigatório.');
+      throw const ValidationException('TÃ­tulo Ã© obrigatÃ³rio.');
     }
     final inicio = DateTime.parse(dataHoraInicioStr);
     final fim = DateTime.parse(dataHoraFimStr);
@@ -39,15 +39,15 @@ class BloqueioService {
   Future<void> deletar(String id, String userId) async {
     final bloqueio = await _bloqueioRepo.findById(id);
     if (bloqueio == null) {
-      throw const NotFoundException('Bloqueio não encontrado.');
+      throw const NotFoundException('Bloqueio nÃ£o encontrado.');
     }
     if (bloqueio.userId != userId) {
-      throw const ForbiddenException('Você não pode deletar este bloqueio.');
+      throw const ForbiddenException('VocÃª nÃ£o pode deletar este bloqueio.');
     }
     await _bloqueioRepo.delete(id);
   }
 
-  /// Lista todos os eventos das bandas em que o user é membro (para agenda visual).
+  /// Lista todos os eventos das bandas em que o user Ã© membro (para agenda visual).
   Future<List<Map<String, dynamic>>> listarEventosDoBanda(String userId) async {
     final rows = await _db.execute(
       Sql.named(

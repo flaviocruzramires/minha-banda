@@ -33,7 +33,7 @@ import '../config/app_config.dart';
 class ServiceLocator {
   ServiceLocator._();
 
-  late final Connection _db;
+  late final Pool _db;
   late final AuthController authController;
   late final BandaController bandaController;
   late final MusicaController musicaController;
@@ -57,17 +57,18 @@ class ServiceLocator {
   Future<void> _setup() async {
     final cfg = AppConfig.instance;
 
-    _db = await Connection.open(
-      Endpoint(
-        host: Uri.parse(cfg.databaseUrl).host,
-        database: Uri.parse(cfg.databaseUrl).pathSegments.first,
-        username: Uri.parse(cfg.databaseUrl).userInfo.split(':').first,
-        password: Uri.parse(cfg.databaseUrl).userInfo.split(':').last,
-        port: Uri.parse(cfg.databaseUrl).port != 0
-            ? Uri.parse(cfg.databaseUrl).port
-            : 5432,
-      ),
-      settings: ConnectionSettings(
+    final uri = Uri.parse(cfg.databaseUrl);
+    final endpoint = Endpoint(
+      host: uri.host,
+      database: uri.pathSegments.first,
+      username: uri.userInfo.split(':').first,
+      password: uri.userInfo.split(':').last,
+      port: uri.port != 0 ? uri.port : 5432,
+    );
+    _db = Pool.withEndpoints(
+      [endpoint],
+      settings: PoolSettings(
+        maxConnectionCount: 4,
         sslMode: cfg.isProduction ? SslMode.require : SslMode.disable,
       ),
     );
@@ -113,5 +114,5 @@ class ServiceLocator {
     notificacaoController = NotificacaoController(notificacaoService);
   }
 
-  Future<void> close() => _db.close();
+  Future<void> close() async => _db.close();
 }

@@ -1,4 +1,4 @@
-import 'package:postgres/postgres.dart';
+﻿import 'package:postgres/postgres.dart';
 import 'package:uuid/uuid.dart';
 import '../../domain/entities/musica.dart';
 import '../../domain/entities/setlist_item.dart';
@@ -45,7 +45,7 @@ abstract interface class MusicaRepository {
 
 class PostgresMusicaRepository implements MusicaRepository {
   const PostgresMusicaRepository(this._conn);
-  final Connection _conn;
+  final Session _conn;
 
   @override
   Future<List<Musica>> listByBanda(String bandaId) async {

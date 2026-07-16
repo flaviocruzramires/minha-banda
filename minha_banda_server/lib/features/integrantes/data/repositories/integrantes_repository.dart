@@ -1,4 +1,4 @@
-import 'package:postgres/postgres.dart';
+﻿import 'package:postgres/postgres.dart';
 
 abstract interface class IntegrantesRepository {
   Future<List<Map<String, dynamic>>> listByBanda(String bandaId);
@@ -22,7 +22,7 @@ abstract interface class IntegrantesRepository {
 
 class PostgresIntegrantesRepository implements IntegrantesRepository {
   const PostgresIntegrantesRepository(this._conn);
-  final Connection _conn;
+  final Session _conn;
 
   @override
   Future<List<Map<String, dynamic>>> listByBanda(String bandaId) async {

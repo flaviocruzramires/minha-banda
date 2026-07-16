@@ -1,4 +1,4 @@
-import 'package:postgres/postgres.dart';
+﻿import 'package:postgres/postgres.dart';
 import 'package:uuid/uuid.dart';
 import '../../domain/entities/local.dart';
 import '../../domain/entities/responsavel_local.dart';
@@ -42,7 +42,7 @@ abstract interface class LocalRepository {
 
 class PostgresLocalRepository implements LocalRepository {
   const PostgresLocalRepository(this._conn);
-  final Connection _conn;
+  final Session _conn;
 
   @override
   Future<List<Local>> listAll({String? cidade}) async {

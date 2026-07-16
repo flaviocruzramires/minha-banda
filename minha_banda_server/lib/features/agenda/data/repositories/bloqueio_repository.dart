@@ -1,4 +1,4 @@
-import 'package:postgres/postgres.dart';
+﻿import 'package:postgres/postgres.dart';
 import 'package:uuid/uuid.dart';
 import '../../domain/entities/bloqueio.dart';
 
@@ -23,7 +23,7 @@ abstract interface class BloqueioRepository {
 
 class PostgresBloqueioRepository implements BloqueioRepository {
   const PostgresBloqueioRepository(this._conn);
-  final Connection _conn;
+  final Session _conn;
 
   @override
   Future<List<Bloqueio>> listByUser(String userId) async {

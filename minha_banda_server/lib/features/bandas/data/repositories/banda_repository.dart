@@ -1,4 +1,4 @@
-import 'package:postgres/postgres.dart';
+﻿import 'package:postgres/postgres.dart';
 import 'package:uuid/uuid.dart';
 import '../../domain/entities/banda.dart';
 
@@ -32,7 +32,7 @@ abstract interface class BandaRepository {
 
 class PostgresBandaRepository implements BandaRepository {
   const PostgresBandaRepository(this._conn);
-  final Connection _conn;
+  final Session _conn;
 
   @override
   Future<Banda?> findByNome(String nome) async {
