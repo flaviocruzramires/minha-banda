@@ -48,6 +48,16 @@ class AuthService {
     return (user: user, token: _gerarToken(user.id));
   }
 
+  Future<AppUser> atualizarPerfil({
+    required String userId,
+    required String nomeArtistico,
+  }) async {
+    if (nomeArtistico.trim().isEmpty) {
+      throw const ValidationException('Nome artístico é obrigatório.');
+    }
+    return _users.updateNome(userId: userId, nomeArtistico: nomeArtistico);
+  }
+
   String _gerarToken(String userId) {
     final config = AppConfig.instance;
     final jwt = JWT({'sub': userId});

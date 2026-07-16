@@ -9,6 +9,7 @@ class Evento {
     this.localId,
     required this.status,
     this.notas,
+    this.valorCache,
     required this.criadoPor,
     required this.criadoEm,
     required this.atualizadoEm,
@@ -23,6 +24,7 @@ class Evento {
   final String? localId;
   final String status;
   final String? notas;
+  final double? valorCache;
   final String criadoPor;
   final DateTime criadoEm;
   final DateTime atualizadoEm;
@@ -37,6 +39,7 @@ class Evento {
         'localId': localId,
         'status': status,
         'notas': notas,
+        'valorCache': valorCache,
         'criadoPor': criadoPor,
         'criadoEm': criadoEm.toIso8601String(),
         'atualizadoEm': atualizadoEm.toIso8601String(),

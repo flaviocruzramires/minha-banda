@@ -58,6 +58,25 @@ class BandaService {
     return token;
   }
 
+  Future<Banda> atualizar({
+    required String bandaId,
+    required String userId,
+    String? nome,
+    String? generoMusical,
+    String? cidade,
+  }) async {
+    final ehMembro = await _bandas.isMembro(bandaId, userId);
+    if (!ehMembro) {
+      throw const ForbiddenException('Você não é membro desta banda.');
+    }
+    return _bandas.update(
+      bandaId: bandaId,
+      nome: nome,
+      generoMusical: generoMusical,
+      cidade: cidade,
+    );
+  }
+
   String gerarLinkConvite(String bandaId, String baseUrl) =>
       '$baseUrl/convite/$bandaId';
 

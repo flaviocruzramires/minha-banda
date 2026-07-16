@@ -50,10 +50,12 @@ class EventoService {
     String? localId,
     String? status,
     String? notas,
+    double? valorCache,
+    bool clearValorCache = false,
   }) async {
     await buscarPorId(id);
-    if (tipo != null && !['show', 'ensaio'].contains(tipo)) {
-      throw const ValidationException("Tipo deve ser 'show' ou 'ensaio'.");
+    if (tipo != null && !['show', 'ensaio', 'reuniao'].contains(tipo)) {
+      throw const ValidationException("Tipo deve ser 'show', 'ensaio' ou 'reuniao'.");
     }
     if (status != null &&
         !['proposto', 'confirmado', 'realizado', 'cancelado'].contains(status)) {
@@ -69,6 +71,8 @@ class EventoService {
       localId: localId,
       status: status,
       notas: notas,
+      valorCache: valorCache,
+      clearValorCache: clearValorCache,
     );
   }
 

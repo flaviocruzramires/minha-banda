@@ -14,6 +14,7 @@ class BandaController {
   Router get router {
     final r = Router();
     r.post('/', _criar);
+    r.patch('/<bandaId>', _atualizar);
     r.post('/<bandaId>/convites', _convidar);
     r.get('/<bandaId>/link-convite', _linkConvite);
     return r;
@@ -46,6 +47,25 @@ class BandaController {
       'banda': banda.toJson(),
       'linkConvite': link,
     });
+  }
+
+  Future<Response> _atualizar(Request request, String bandaId) async {
+    final userId = request.userId;
+    final body = await RequestHelper.parseBody(request);
+
+    final nome = body['nome'] as String?;
+    final genero = body['generoMusical'] as String?;
+    final cidade = body['cidade'] as String?;
+
+    final banda = await _service.atualizar(
+      bandaId: bandaId,
+      userId: userId,
+      nome: nome,
+      generoMusical: genero,
+      cidade: cidade,
+    );
+
+    return ResponseHelper.ok({'banda': banda.toJson()});
   }
 
   Future<Response> _convidar(Request request, String bandaId) async {

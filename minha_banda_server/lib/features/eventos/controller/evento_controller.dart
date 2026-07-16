@@ -68,6 +68,9 @@ class EventoController {
     final localId = body['localId'] as String?;
     final status = body['status'] as String?;
     final notas = body['notas'] as String?;
+    final valorCacheRaw = body['valorCache'];
+    final double? valorCache = valorCacheRaw != null ? (valorCacheRaw as num).toDouble() : null;
+    final bool clearValorCache = body.containsKey('valorCache') && valorCacheRaw == null;
 
     final evento = await _service.atualizar(
       id: id,
@@ -78,6 +81,8 @@ class EventoController {
       localId: localId,
       status: status,
       notas: notas,
+      valorCache: valorCache,
+      clearValorCache: clearValorCache,
     );
 
     return ResponseHelper.ok({'evento': evento.toJson()});

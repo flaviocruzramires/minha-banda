@@ -3,6 +3,7 @@ import 'package:shelf_router/shelf_router.dart';
 import '../../../core/exceptions/app_exception.dart';
 import '../../../core/helpers/request_helper.dart';
 import '../../../core/helpers/response_helper.dart';
+import '../../../core/middleware/auth_middleware.dart';
 import '../service/auth_service.dart';
 
 class AuthController {
@@ -14,6 +15,18 @@ class AuthController {
     r.post('/register', _register);
     r.post('/login', _login);
     return r;
+  }
+
+  // Chamado diretamente (fora do router) pela rota protegida /api/v1/me
+  Future<Response> atualizarMe(Request request) async {
+    final userId = request.userId;
+    final body = await RequestHelper.parseBody(request);
+    final nome = body['nomeArtistico'] as String? ?? '';
+    if (nome.trim().isEmpty) {
+      throw const ValidationException('nomeArtistico é obrigatório.');
+    }
+    final user = await _service.atualizarPerfil(userId: userId, nomeArtistico: nome);
+    return ResponseHelper.ok({'user': user.toJson()});
   }
 
   Future<Response> _register(Request request) async {

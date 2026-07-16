@@ -69,7 +69,11 @@ void main() async {
     // Conflitos
     ..mount('/conflitos/', sl.conflitosController.router.call)
     // Teleprompter
-    ..mount('/teleprompter/', sl.teleprompterController.router.call);
+    ..mount('/teleprompter/', sl.teleprompterController.router.call)
+    // Perfil do usuário autenticado
+    ..patch('/me', sl.authController.atualizarMe)
+    // Notificações
+    ..mount('/notificacoes/', sl.notificacaoController.router.call);
 
   final protectedHandler = Pipeline()
       .addMiddleware(authMiddleware())

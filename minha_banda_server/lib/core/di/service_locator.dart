@@ -25,6 +25,9 @@ import '../../features/agenda/data/repositories/bloqueio_repository.dart';
 import '../../features/agenda/service/bloqueio_service.dart';
 import '../../features/conflitos/controller/conflitos_controller.dart';
 import '../../features/conflitos/service/conflitos_service.dart';
+import '../../features/notificacoes/controller/notificacao_controller.dart';
+import '../../features/notificacoes/data/repositories/notificacao_repository.dart';
+import '../../features/notificacoes/service/notificacao_service.dart';
 import '../config/app_config.dart';
 
 class ServiceLocator {
@@ -43,6 +46,7 @@ class ServiceLocator {
   late final EventoActionsController eventoActionsController;
   late final BloqueioController bloqueioController;
   late final ConflitosController conflitosController;
+  late final NotificacaoController notificacaoController;
 
   static Future<ServiceLocator> init() async {
     final sl = ServiceLocator._();
@@ -103,6 +107,10 @@ class ServiceLocator {
     bloqueioController = BloqueioController(bloqueioService);
     final conflitosService = ConflitosService(eventoRepo, bloqueioRepo, _db);
     conflitosController = ConflitosController(conflitosService);
+
+    final notificacaoRepo = PostgresNotificacaoRepository(_db);
+    final notificacaoService = NotificacaoService(notificacaoRepo);
+    notificacaoController = NotificacaoController(notificacaoService);
   }
 
   Future<void> close() => _db.close();
