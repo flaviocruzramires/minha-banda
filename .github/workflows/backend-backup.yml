@@ -13,19 +13,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Dump Neon Postgres
+        env:
+          DATABASE_URL: ${{ secrets.NEON_DATABASE_URL_DIRECT }}
         run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "Secret NEON_DATABASE_URL_DIRECT não configurado — pulando backup." >&2
+            exit 1
+          fi
           FILENAME="minha_banda_$(date +%Y%m%d_%H%M%S).dump"
           docker run --rm \
-            -e PGPASSWORD="${{ secrets.NEON_DB_PASSWORD }}" \
+            -e PGSSLMODE=require \
             -v /tmp:/backup \
             postgres:16 \
-            pg_dump \
-              --host="${{ secrets.NEON_DB_HOST }}" \
-              --port=5432 \
-              --username="${{ secrets.NEON_DB_USER }}" \
-              --dbname=minha_banda \
-              --format=c \
-              --file="/backup/$FILENAME"
+            pg_dump "$DATABASE_URL" --no-owner --no-privileges -F c -f "/backup/$FILENAME"
           echo "BACKUP_FILE=$FILENAME" >> $GITHUB_ENV
 
       - name: Upload artifact

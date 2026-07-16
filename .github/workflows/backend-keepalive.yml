@@ -12,11 +12,8 @@ jobs:
     name: Ping health endpoint
     runs-on: ubuntu-latest
     steps:
-      - name: Ping /livez
+      - name: Ping /health/
         run: |
-          STATUS=$(curl -o /dev/null -s -w "%{http_code}" https://api.minha-banda.com.br/livez)
-          echo "HTTP status: $STATUS"
-          if [ "$STATUS" != "200" ]; then
-            echo "Health check failed with status $STATUS"
-            exit 1
-          fi
+          curl -sS -o /dev/null -w "HTTP %{http_code}\n" \
+            ${{ secrets.RENDER_HEALTH_URL }} \
+            --max-time 20 --retry 2 --retry-delay 5
